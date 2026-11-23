@@ -1,16 +1,23 @@
-# OskiRide — 3D Cycling Simulator
+# OskiRide
 
-**Ride beyond the room.**
+**[Download for Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)** · [Watch the ride demo](#ride-demo) · [Screenshot gallery](wiki/en/Screenshots.md) · [Documentation](wiki/en/README.md)
 
-Ride GPX routes and structured workouts indoors with a Bluetooth smart trainer or keyboard-controlled power. OskiRide runs locally and includes virtual shifting, a ride journal, and FIT and TCX exports. [Download for Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1) · [Complete feature guide](wiki/en/Features.md)
+[![Ride beyond the room. OskiRide on Alpe d’Huez with a pace ghost, a live grade readout, and an elevation profile](docs/media/github-cover.png)](wiki/en/Screenshots.md)
+
+Ride GPX routes and structured workouts in 3D with a Bluetooth smart trainer or keyboard-controlled power. OskiRide runs locally and includes virtual shifting, a ride journal, and FIT and TCX exports.
 
 ## Ride demo
 
-Watch a keyboard-powered ride on Alpe d’Huez. The rider starts at **0 W**, moves when power is added with the slider, shifts up one virtual gear, and switches from the chase view to the overhead camera.
+On Alpe d’Huez, a keyboard-powered rider starts at **0 W**, moves when power is added with the slider, shifts up one gear, and switches from the chase view to the overhead camera.
+
+<details>
+<summary>Play the 12-second ride demo</summary>
 
 ![OskiRide starts at zero watts, adds simulated power, shifts up, and switches to the overhead camera](docs/media/ride-demo.gif)
 
-[Download the demo video (MP4)](https://github.com/Securityoe/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4) · [Explore the screenshot gallery](wiki/en/Screenshots.md)
+</details>
+
+[Download the demo video (MP4)](https://github.com/Securityoe/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4)
 
 ## Install and start riding
 
@@ -38,6 +45,10 @@ Download the synthetic 4.3 km route, then open **Ride → Import GPX** and selec
 [All features and menu paths](wiki/en/Features.md) · [Documentation index](wiki/en/README.md) · [Privacy and ride data](wiki/en/Privacy.md)
 
 ## Ride, train, and review
+
+| Follow an interval | Compare two rides |
+| --- | --- |
+| [![The workout HUD shows live and target power, target cadence, and a countdown](docs/media/screenshots/workout-in-progress.png)](wiki/en/Screenshots.md#workout-in-progress) | [![The ride journal compares two Alpine Pass sessions by power and time](docs/media/screenshots/ride-comparison.png)](wiki/en/Screenshots.md#after-the-ride) |
 
 - **Your routes.** **Ride → My GPX routes** lets you search, rename, favorite, and revisit saved GPX tracks. Importing identical contents keeps the existing entry. Open **Ride history** to see previous rides on that route. [Routes and graphics](wiki/en/Routes-and-Graphics.md)
 - **Your workouts.** Importing a workout selects the plan. The session starts when you select **Start ride** or **Start workout**, and ride totals advance while you are moving. Pausing stops the counters and interval timer, cancels active ERG commands, and requests neutral resistance on a controlled trainer. Resuming restores the selected control mode. [Workouts and journal](wiki/en/Workouts-and-Journal.md)

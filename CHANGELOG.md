@@ -14,6 +14,7 @@ Format oparty jest na zasadach [Keep a Changelog](https://keepachangelog.com/).
 - Isolated desktop windows and restricted navigation, Bluetooth selection, and renderer messages to the app views that use them.
 - Enabled integrity verification for the packaged Electron archive and disabled unused Node execution and debugging options in the packaged binary.
 - Added documentation on locally stored ride data, exported files, and diagnostic logs. [Privacy and ride data](wiki/en/Privacy.md)
+- Refreshed the GitHub README with a branded cover and ride preview, organized the nine screenshots by ride stage, and moved download links to the top of the release notes. [Screenshots](wiki/en/Screenshots.md) · [Release notes](docs/Release-Notes.md)
 
 ## [1.0.0] — 2026-11-23
 
