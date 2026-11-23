@@ -48,6 +48,8 @@ Download the synthetic 4.3 km route, then open **Ride → Import GPX** and selec
 
 [All features and menu paths](wiki/en/Features.md) · [Hardware compatibility](wiki/en/Equipment.md#hardware-compatibility) · [Privacy and ride data](wiki/en/Privacy.md)
 
+Help verify trainer compatibility on Windows by sharing your pairing, SIM, and ERG results. [Test my trainer](https://github.com/OskiOski89/OskiRide/issues/new?template=trainer-test.yml) · [Roadmap](ROADMAP.md)
+
 ## Ride, train, and review
 
 | Follow an interval | Compare two rides |

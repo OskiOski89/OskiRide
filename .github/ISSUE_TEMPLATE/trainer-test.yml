@@ -1,0 +1,82 @@
+name: Test my trainer
+description: Share your smart trainer pairing and resistance test results on Windows.
+title: "[Trainer test] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing OskiRide. Use **Devices → Find trainer** to pair, then open **Device check** to check live readings. Share one trainer per report, including successful tests. See the [hardware compatibility guide](https://github.com/OskiOski89/OskiRide/blob/main/wiki/en/Equipment.md#hardware-compatibility).
+
+        This report will be public. Leave out serial numbers, private routes, and unreviewed logs.
+  - type: input
+    id: trainer
+    attributes:
+      label: Trainer or smart bike model
+      description: Include the manufacturer and exact model.
+      placeholder: Wahoo KICKR CORE
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Trainer firmware
+      description: Leave blank if you could not find it.
+  - type: input
+    id: oskiride-version
+    attributes:
+      label: OskiRide version
+      placeholder: 1.0.1
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows version
+      options:
+        - Windows 11
+        - Windows 10
+        - Other Windows version
+    validations:
+      required: true
+  - type: dropdown
+    id: pairing
+    attributes:
+      label: Bluetooth pairing result
+      options:
+        - Paired and stayed connected
+        - Paired but disconnected during the test
+        - Appeared in the device list but did not pair
+        - Did not appear in the device list
+    validations:
+      required: true
+  - type: dropdown
+    id: sim
+    attributes:
+      label: SIM resistance result
+      description: In SIM mode, did resistance change as the grade changed?
+      options:
+        - Worked
+        - Worked intermittently
+        - Did not work
+        - Unavailable on my setup
+        - Not tested
+    validations:
+      required: true
+  - type: dropdown
+    id: erg
+    attributes:
+      label: ERG target power result
+      description: In ERG mode, did the trainer adjust resistance toward the workout or manual power target?
+      options:
+        - Worked
+        - Worked intermittently
+        - Did not work
+        - Unavailable on my setup
+        - Not tested
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Readings and test notes
+      description: If you have more details, note which readings appeared in Device check, your Bluetooth adapter, or the steps that reproduced a problem.

@@ -29,7 +29,7 @@ Power meters and speed sensors supply telemetry. Automatic resistance adjustment
 
 ### Test coverage
 
-The tables describe the protocols OskiRide implements. Automated checks use BLE test doubles, including simulated trainer commands and simulated Click V1 and V2 input. Model-by-model testing on physical hardware is pending. Use [Device check](#device-check-and-spindown) to check readings and resistance response on your setup. [Test setup](Troubleshooting.md#run-the-regression-tests)
+The tables describe the protocols OskiRide implements. Automated checks use BLE test doubles, including simulated trainer commands and simulated Click V1 and V2 input. Model-by-model testing on physical hardware is pending. Use [Device check](#device-check-and-spindown) to check readings and resistance response on your setup. [Test my trainer](https://github.com/OskiOski89/OskiRide/issues/new?template=trainer-test.yml) · [Automated test setup](Troubleshooting.md#run-the-regression-tests)
 
 ## SIM and ERG settings
 

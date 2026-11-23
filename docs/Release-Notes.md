@@ -67,3 +67,5 @@ Bluetooth compatibility and resistance response depend on your equipment. The co
 Use the installation and troubleshooting guides for Windows setup, pairing, and ride recovery. [Installation and first ride](https://github.com/OskiOski89/OskiRide/blob/main/wiki/en/Installation.md) · [Troubleshooting](https://github.com/OskiOski89/OskiRide/blob/main/wiki/en/Troubleshooting.md)
 
 For help, include your Windows version, device model, and steps to reproduce the issue. [Report an issue](https://github.com/OskiOski89/OskiRide/issues)
+
+If you tried a smart trainer, share the model and your results for pairing, SIM resistance, and ERG power. [Test my trainer](https://github.com/OskiOski89/OskiRide/issues/new?template=trainer-test.yml) · [Roadmap](https://github.com/OskiOski89/OskiRide/blob/main/ROADMAP.md)
