@@ -4,7 +4,11 @@
 
 [![Ride beyond the room. OskiRide on Alpe d’Huez with a pace ghost, a live grade readout, and an elevation profile](docs/media/github-cover.png)](wiki/en/Screenshots.md)
 
-Ride GPX routes and structured workouts in 3D with a Bluetooth smart trainer or keyboard-controlled power. OskiRide runs locally and includes virtual shifting, a ride journal, and FIT and TCX exports.
+## The idea behind OskiRide
+
+Bring familiar roads into your indoor training. Import a GPX file from a favorite loop or an upcoming climb and ride it as a 3D course. A compatible smart trainer can adjust resistance to match the gradient, and keyboard power lets you try the route without a trainer.
+
+Revisit the same course to practice a climb or compare your efforts over time. Your routes and ride history stay on your device.
 
 ## Ride demo
 

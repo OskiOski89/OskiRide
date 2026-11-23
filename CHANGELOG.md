@@ -18,6 +18,7 @@ Format oparty jest na zasadach [Keep a Changelog](https://keepachangelog.com/).
 - Refined the README cover with a subtler forest-green background.
 - Added a hardware compatibility table with verification status and prepared a 1280 × 640 image for shared repository links. [Hardware compatibility](wiki/en/Equipment.md#hardware-compatibility)
 - Updated repository, download, and image links after the GitHub account rename.
+- Added a short explanation of the idea behind OskiRide to the README.
 
 ## [1.0.0] — 2026-11-23
 
