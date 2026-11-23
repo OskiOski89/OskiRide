@@ -6,7 +6,7 @@ OskiRide jest napisany w modularnym języku JavaScript (ES Modules) bez obowiąz
 
 ## Instalator Windows x64
 
-1. W **Assets** pobierz do tego samego folderu instalator `OskiRide-Setup-1.0.1-x64.exe` i plik `SHA256SUMS.txt`. [OskiRide 1.0.1 w GitHub Releases](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)
+1. W **Assets** pobierz do tego samego folderu instalator `OskiRide-Setup-1.0.1-x64.exe` i plik `SHA256SUMS.txt`. [OskiRide 1.0.1 w GitHub Releases](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)
 2. [Sprawdź sumę kontrolną](#sprawdzenie-instalatora-i-komunikat-smartscreen) i uruchom instalator na Windows 10/11 (x64). Pakiet zawiera środowisko Electron i zasoby 3D.
 3. Uruchom **OskiRide** z menu Start. Interfejs wydania jest po angielsku. Do łączenia z urządzeniami potrzebny jest adapter Bluetooth Low Energy.
 4. Wybierz **Ride → Start ride**. Symulacja zaczyna się od 0 W. Dodaj moc strzałką ↑ lub suwakiem, aby ruszyć.

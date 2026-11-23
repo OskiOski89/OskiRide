@@ -43,4 +43,4 @@ The interval card shows the active step, time left, and targets from the importe
 
 Compare the four rider models and preview their poses and cadence before choosing one.
 
-[Complete feature guide](Features.md) · [Download for Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)
+[Complete feature guide](Features.md) · [Download for Windows x64](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)

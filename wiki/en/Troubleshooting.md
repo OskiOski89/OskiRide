@@ -12,7 +12,7 @@
 | The frame rate drops | Try **Low** graphics or enable adaptive scenery and shadows. |
 | An interrupted ride is offered at startup | Select **Restore** to bring it back paused. Reconnect any equipment you need before resuming. |
 
-If you need to report a problem, use **Settings → Logs → Download ride logs**. The JSON can include your device and route names, so review it before sharing. Include your Windows version, equipment model, and steps to reproduce the issue. [GitHub Issues](https://github.com/Securityoe/OskiRide/issues)
+If you need to report a problem, use **Settings → Logs → Download ride logs**. The JSON can include your device and route names, so review it before sharing. Include your Windows version, equipment model, and steps to reproduce the issue. [GitHub Issues](https://github.com/OskiOski89/OskiRide/issues)
 
 ## Run the regression tests
 

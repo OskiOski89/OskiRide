@@ -1,6 +1,6 @@
 # OskiRide documentation
 
-OskiRide 1.0.1 is a 3D indoor cycling simulator for Windows x64. Use keyboard-controlled power or connect Bluetooth cycling equipment. [Download the Windows release](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)
+OskiRide 1.0.1 is a 3D indoor cycling simulator for Windows x64. Use keyboard-controlled power or connect Bluetooth cycling equipment. [Download the Windows release](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)
 
 | Guide | What it covers |
 | --- | --- |

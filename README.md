@@ -1,6 +1,6 @@
 # OskiRide
 
-**[Download for Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)** · [Watch the ride demo](#ride-demo) · [Screenshot gallery](wiki/en/Screenshots.md) · [Documentation](wiki/en/README.md)
+**[Download for Windows x64](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)** · [Watch the ride demo](#ride-demo) · [Screenshot gallery](wiki/en/Screenshots.md) · [Documentation](wiki/en/README.md)
 
 [![Ride beyond the room. OskiRide on Alpe d’Huez with a pace ghost, a live grade readout, and an elevation profile](docs/media/github-cover.png)](wiki/en/Screenshots.md)
 
@@ -17,17 +17,17 @@ On Alpe d’Huez, a keyboard-powered rider starts at **0 W**, moves when power i
 
 </details>
 
-[Download the demo video (MP4)](https://github.com/Securityoe/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4)
+[Download the demo video (MP4)](https://github.com/OskiOski89/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4)
 
 ## Install and start riding
 
-1. Under **Assets**, download the 1.0.1 installer for 64-bit Windows 10 or 11 and its `SHA256SUMS.txt` file. [GitHub Releases](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)
+1. Under **Assets**, download the 1.0.1 installer for 64-bit Windows 10 or 11 and its `SHA256SUMS.txt` file. [GitHub Releases](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)
 2. Verify the SHA-256 hash before opening the installer. Windows may show a SmartScreen warning because the installer is unsigned. [Windows installation and verification](wiki/en/Installation.md#check-the-download-and-windows-smartscreen)
 3. Open **Settings** to enter your FTP, body weight, and bike type. Choose a route in **Ride** and select **Start ride**. Keyboard simulation starts at **0 W**. Set your power with **↑ / ↓** or the **Power** slider. To pair equipment, use **Devices**, then check its readings in **Device check**.
 
 ### Try a sample GPX
 
-Download the synthetic 4.3 km route, then open **Ride → Import GPX** and select the file. OskiRide previews the elevation and saves the track in **My GPX routes**. Select **Start ride** when ready. [Download the sample GPX](https://github.com/Securityoe/OskiRide/releases/download/v1.0.1/OskiRide-Sample-Alpine.gpx)
+Download the synthetic 4.3 km route, then open **Ride → Import GPX** and select the file. OskiRide previews the elevation and saves the track in **My GPX routes**. Select **Start ride** when ready. [Download the sample GPX](https://github.com/OskiOski89/OskiRide/releases/download/v1.0.1/OskiRide-Sample-Alpine.gpx)
 
 ## What you can do in OskiRide
 
@@ -87,4 +87,4 @@ npm run desktop
 - A GPX performance check measured about 60 FPS in six locations across three graphics presets on Intel Iris Xe at 1366×768 and DPR 1. Dense scenery exceeded the draw-call budget. Longer rides and higher resolutions need separate measurements. [Technical documentation](docs/DOKUMENTACJA_TECHNICZNA.md)
 - `src/` contains the ride loop, Bluetooth, GPX processing, physics, training, and exports. `tools/3d/` includes Blender helpers and validators. [Source map](wiki/en/Troubleshooting.md#where-the-code-lives)
 - The project’s visual identity is **Sun and Forest**, with the OR logo, sunny yellow, and forest green. The repository contains editable Blender assets and models for 3D printing the logo. [3D and brand assets](grafika/README.md)
-- The project changelog records development history. [Release notes](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1) · [Project changelog](CHANGELOG.md)
+- The project changelog records development history. [Release notes](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1) · [Project changelog](CHANGELOG.md)

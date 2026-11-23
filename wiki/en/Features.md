@@ -1,6 +1,6 @@
 # OskiRide 1.0.1 features
 
-OskiRide is a local 3D indoor cycling simulator. Ride a GPX route, follow a structured workout, or race one of your saved efforts. You can control power with the keyboard or ride using readings from Bluetooth equipment. [Download for Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1) · [Installation and download verification](Installation.md)
+OskiRide is a local 3D indoor cycling simulator. Ride a GPX route, follow a structured workout, or race one of your saved efforts. You can control power with the keyboard or ride using readings from Bluetooth equipment. [Download for Windows x64](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1) · [Installation and download verification](Installation.md)
 
 ## Find your way around
 

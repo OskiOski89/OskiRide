@@ -2,7 +2,7 @@
 
 ## Windows installer
 
-1. Download `OskiRide-Setup-1.0.1-x64.exe` and `SHA256SUMS.txt` from **Assets** into the same folder. [OskiRide 1.0.1 release](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1)
+1. Download `OskiRide-Setup-1.0.1-x64.exe` and `SHA256SUMS.txt` from **Assets** into the same folder. [OskiRide 1.0.1 release](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)
 2. [Verify the download](#check-the-download-and-windows-smartscreen) and run the installer on 64-bit Windows 10 or 11. The package includes Electron and the 3D assets.
 3. Open **OskiRide** from the Windows Start menu. A Bluetooth Low Energy adapter is needed to pair Bluetooth equipment.
 
@@ -26,7 +26,7 @@ Compare the first result with the hash in front of the installer filename. Lette
 
 ### Try a sample GPX
 
-1. Download `OskiRide-Sample-Alpine.gpx`, a synthetic 4.3 km route also shown in the screenshot gallery. [Download the sample GPX](https://github.com/Securityoe/OskiRide/releases/download/v1.0.1/OskiRide-Sample-Alpine.gpx) · [GPX library screenshot](Screenshots.md#route-selection-and-gpx-library)
+1. Download `OskiRide-Sample-Alpine.gpx`, a synthetic 4.3 km route also shown in the screenshot gallery. [Download the sample GPX](https://github.com/OskiOski89/OskiRide/releases/download/v1.0.1/OskiRide-Sample-Alpine.gpx) · [GPX library screenshot](Screenshots.md#route-selection-and-gpx-library)
 2. In OskiRide, open **Ride → Import GPX** and select the downloaded file. Confirm that it appears in **My GPX routes**.
 3. Use **Start location** to pick a point along the elevation profile, then select **Start ride**.
 

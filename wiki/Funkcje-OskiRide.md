@@ -1,6 +1,6 @@
 # Funkcje OskiRide 1.0.1
 
-OskiRide to lokalny symulator kolarstwa 3D. Możesz poznawać trasy z GPX, odtwarzać trening interwałowy i wracać do zapisanych przejazdów. Do jazdy wystarczy klawiatura. Trenażer i czujniki Bluetooth umożliwiają jazdę na podstawie odczytów ze sprzętu. [Pobierz wydanie na Windows x64](https://github.com/Securityoe/OskiRide/releases/tag/v1.0.1) · [Instalacja i sprawdzenie pliku](Instalacja-i-Uruchomienie.md)
+OskiRide to lokalny symulator kolarstwa 3D. Możesz poznawać trasy z GPX, odtwarzać trening interwałowy i wracać do zapisanych przejazdów. Do jazdy wystarczy klawiatura. Trenażer i czujniki Bluetooth umożliwiają jazdę na podstawie odczytów ze sprzętu. [Pobierz wydanie na Windows x64](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1) · [Instalacja i sprawdzenie pliku](Instalacja-i-Uruchomienie.md)
 
 ## Gdzie znaleźć funkcje
 
