@@ -21,6 +21,7 @@ Format oparty jest na zasadach [Keep a Changelog](https://keepachangelog.com/).
 - Added a short explanation of the idea behind OskiRide to the README.
 - Clarified the README heading and repository description to identify OskiRide as a Windows indoor cycling simulator.
 - Added a trainer-test form for Windows pairing, SIM, and ERG results, plus a short [roadmap](ROADMAP.md).
+- Prioritized physical hardware coverage and more faithful GPX route reconstruction in the roadmap.
 
 ## [1.0.0] — 2026-11-23
 
