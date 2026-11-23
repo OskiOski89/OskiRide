@@ -1,4 +1,4 @@
-# OskiRide
+# OskiRide — 3D Indoor Cycling Simulator for Windows
 
 **[Download for Windows x64](https://github.com/OskiOski89/OskiRide/releases/tag/v1.0.1)** · [Watch the ride demo](#ride-demo) · [Screenshot gallery](wiki/en/Screenshots.md) · [Documentation](wiki/en/README.md)
 
