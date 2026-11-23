@@ -42,7 +42,7 @@ Download the synthetic 4.3 km route, then open **Ride → Import GPX** and selec
 | **3D world** | Four rider models, three camera views, three graphics presets, selectable weather and time of day, PBR scenery, tunnels, 12 spectator models, and crowd audio on Alpe d’Huez. |
 | **Recovery and logs** | Automatic pause after a trainer disconnect, recovery of interrupted rides, and individual ride logs with JSON export. |
 
-[All features and menu paths](wiki/en/Features.md) · [Documentation index](wiki/en/README.md) · [Privacy and ride data](wiki/en/Privacy.md)
+[All features and menu paths](wiki/en/Features.md) · [Hardware compatibility](wiki/en/Equipment.md#hardware-compatibility) · [Privacy and ride data](wiki/en/Privacy.md)
 
 ## Ride, train, and review
 

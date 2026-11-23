@@ -2,6 +2,8 @@
 
 W angielskim interfejsie otwórz **Devices**. Próbę odczytów i oporu znajdziesz w **Device check**. Bez źródła mocy jazda w symulacji zaczyna się od 0 W.
 
+Odczyty, tryby oporu i miejsca parowania zebrano w angielskiej tabeli. [Zgodność sprzętu i zakres testów](en/Equipment.md#hardware-compatibility)
+
 Moduł `src/ble/trainerController.js` odpowiada za komunikację Web Bluetooth API z trenażerami Smart, miernikami mocy, czujnikami kadencji/prędkości i pulsometrami.
 
 ---

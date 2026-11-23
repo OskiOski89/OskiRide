@@ -60,7 +60,7 @@ Watch OskiRide start from **0 W**, shift up a virtual gear, and switch to the ov
 | **3D ride settings** | Choose among four rider models, three cameras, graphics presets, weather, road appearance, and time of day. Adaptive graphics can adjust scenery and shadows. Alpe d’Huez has crowd audio near bend 7. |
 | **Recovery and diagnostics** | Restore a saved ride in pause, resume manually after a trainer disconnect, and download JSON logs for individual rides. |
 
-Bluetooth compatibility and resistance response depend on your equipment. The equipment guide lists protocol support for selected Tacx and Wahoo trainers. The interface is primarily in English. [Complete feature guide](https://github.com/Securityoe/OskiRide/blob/main/wiki/en/Features.md) · [Equipment compatibility](https://github.com/Securityoe/OskiRide/blob/main/wiki/en/Equipment.md)
+Bluetooth compatibility and resistance response depend on your equipment. The compatibility table shows what each protocol can do and how it was verified. The interface is primarily in English. [Complete feature guide](https://github.com/Securityoe/OskiRide/blob/main/wiki/en/Features.md) · [Hardware compatibility table](https://github.com/Securityoe/OskiRide/blob/main/wiki/en/Equipment.md#hardware-compatibility)
 
 ## Help
 

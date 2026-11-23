@@ -16,6 +16,7 @@ Format oparty jest na zasadach [Keep a Changelog](https://keepachangelog.com/).
 - Added documentation on locally stored ride data, exported files, and diagnostic logs. [Privacy and ride data](wiki/en/Privacy.md)
 - Refreshed the GitHub README with a branded cover and ride preview, organized the nine screenshots by ride stage, and moved download links to the top of the release notes. [Screenshots](wiki/en/Screenshots.md) · [Release notes](docs/Release-Notes.md)
 - Refined the README cover with a subtler forest-green background.
+- Added a hardware compatibility table with verification status and prepared a 1280 × 640 image for shared repository links. [Hardware compatibility](wiki/en/Equipment.md#hardware-compatibility)
 
 ## [1.0.0] — 2026-11-23
 
