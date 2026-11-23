@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OskiRide: trening na Twojej trasie</title>
+  <meta name="description" content="Symulator kolarski 3D z obsługą tras GPX i trenażerów Smart Bluetooth FTMS." />
+  <link rel="stylesheet" href="style.css?v=7" />
+  <meta name="theme-color" content="#234C3B" />
+  <link rel="icon" type="image/png" href="grafika/marka-oskiride/oskiride-logo.png?v=2" />
+  <link rel="stylesheet" href="grafika/marka-oskiride/theme.css?v=7" />
+  <link rel="stylesheet" href="src/ui/rideLogs.css?v=20261030" />
+  <link rel="stylesheet" href="src/ui/deviceTest.css?v=20261030" />
+  <link rel="stylesheet" href="src/ui/routeLibrary.css?v=20261030" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./grafika/vendor/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Web Interface Guidelines: Skip Link -->
+  <a href="#hud-top-left" class="skip-link">Przejdź do głównej zawartości</a>
+
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+    <filter id="oskiride-logo-on-dark" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="-0.043478 0 0 0 0.990281  -0.212560 0 0 0 0.990104  -0.763285 0 0 0 1.022412  0 0 0 1 0" />
+    </filter>
+    <symbol id="icon-wind-head" viewBox="0 0 24 24"><path d="M12 20V4m-6 6 6-6 6 6" /></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 4v16M16 4v16" /></symbol>
+    <symbol id="icon-wind-tail" viewBox="0 0 24 24"><path d="M12 4v16m-6-6 6 6 6-6" /></symbol>
+    <symbol id="icon-wind-cross" viewBox="0 0 24 24"><path d="M3 12h18M7 8l-4 4 4 4m10-8 4 4-4 4" /></symbol>
+  </defs></svg>
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0"><defs><symbol id="icon-link" viewBox="0 0 24 24"><path d="M12 3v18m0-18 6 6-12 6 6 6 6-6-12-6"/></symbol><symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z"/></symbol><symbol id="icon-controller" viewBox="0 0 24 24"><path d="M6 11h4M8 9v4m6-2h.01M17 13h.01M6 19 3 8a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3l-3 11a3 3 0 0 1-5-2l-2-2-2 2a3 3 0 0 1-5 2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol><symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol><symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></symbol><symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="icon-restart" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6"/></symbol><symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6m8 4v6"/></symbol><symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol><symbol id="icon-trainer" viewBox="0 0 24 24"><circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 18V8l3-4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13l3-5 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="5" r="1" fill="currentColor"/></symbol><symbol id="icon-bolt" viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="icon-speed" viewBox="0 0 24 24"><path d="M12 4a9 9 0 0 0-9 9c0 2.5 1 4.7 2.6 6.3L12 12V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="m14 11 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol></defs></svg>
+  <!-- 3D World Canvas -->
+  <div id="canvas-container"></div>
+
+  <button type="button" id="trainer-connection-indicator" class="trainer-connection-indicator" data-state="disconnected" aria-label="Trenażer niepołączony. Otwórz urządzenia." title="Trenażer niepołączony. Otwórz urządzenia."><span aria-hidden="true"></span></button>
+
+  <!-- Center Alerts Stack (Drafting, Course Hazard, ClimbPro, Structured Workout) -->
+  <div id="alerts-stack" role="region" aria-label="Alerty jazdy" aria-live="polite" aria-atomic="true">
+    <div id="trainer-pause-banner" class="trainer-pause-banner" hidden>
+      <div><strong id="trainer-pause-title">Pauza — utracono połączenie z trenażerem</strong><p id="trainer-pause-description">Połącz ponownie trenażer. Liczniki i interwał są zatrzymane.</p></div>
+      <button type="button" id="btn-trainer-resume" class="btn btn-primary" disabled>Wznów jazdę</button>
+    </div>
+    <div id="draft-banner" class="alert-pill draft-pill hidden">
+      Jazda w grupie (opór mniejszy o 25%)
+    </div>
+    <div id="workout-banner" class="workout-card hidden">
+      <div class="workout-header">
+        <span id="workout-step-title" class="workout-title">Interwał Sweet Spot</span>
+        <div class="workout-pills">
+          <span id="workout-erg-badge" class="badge-erg">ERG</span>
+          <span id="workout-step-timer" class="workout-timer">00:00</span>
+        </div>
+      </div>
+      <div class="workout-targets-row">
+        <span class="workout-target-item">Cel: <strong id="workout-target-watts">225 W</strong></span>
+        <span id="workout-target-cad-col" class="workout-target-item">Kadencja: <strong id="workout-target-cad">90 obr./min</strong></span>
+        <span class="workout-target-item">Krok: <strong id="workout-step-num">1/5</strong></span>
+      </div>
+      <div class="workout-bar-bg">
+        <div id="workout-bar-fill" class="workout-bar-fill"></div>
+      </div>
+    </div>
+    <div id="hazard-banner" class="hazard-card hidden">
+      <div id="hazard-icon" class="hazard-icon-box"></div>
+      <div class="hazard-text-col">
+        <span id="hazard-title" class="hazard-title">Zakręt w lewo</span>
+        <span id="hazard-subtitle" class="hazard-sub" style="display: none;"></span>
+      </div>
+      <div id="hazard-dist" class="hazard-dist-badge">Za 100 m</div>
+    </div>
+    <div id="climbpro-banner" class="climbpro-card hidden">
+      <div class="climbpro-header">
+        <span id="climbpro-title">Podjazd #1 (kat. 2)</span>
+        <span id="climbpro-stats">Do szczytu: 1,20 km (śr. 6,5%)</span>
+      </div>
+      <div class="climbpro-bar-bg">
+        <div id="climbpro-bar-fill" class="climbpro-bar-fill"></div>
+      </div>
+      <div id="climbpro-challenger" class="climbpro-challenger-row hidden">
+        <div class="challenger-stat">
+          <span class="challenger-label">Rywal KOM / PR:</span>
+          <span id="climbpro-challenger-badge" class="challenger-badge ahead">+42 m (−4,2 s)</span>
+        </div>
+        <div class="challenger-stat">
+          <span class="challenger-label">Przewyższenie:</span>
+          <span id="climbpro-challenger-ele" class="challenger-ele">Do szczytu: +180 m</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Left: OskiRide Power (with FTP Zone), Speed, Cadence, HR, Gear & Averages -->
+  <div id="hud-top-left" class="hud-panel">
+    <div class="brand-header">
+      <div class="brand-logo-frame brand-logo-hud"><img src="grafika/marka-oskiride/oskiride-logo.png?v=2" alt="OskiRide" width="2103" height="748" /></div>
+      <div class="header-right-pills">
+        <small id="hud-fps" class="fps-badge hidden">60 kl./s</small>
+        <button id="btn-top-menu" class="top-menu-btn" title="Otwórz menu główne, wybór trasy i ustawienia (Esc)">
+          Menu
+        </button>
+      </div>
+    </div>
+
+    <div class="power-box" id="power-box">
+      <div class="power-top-row">
+        <div class="power-main">
+          <span class="power-value" id="hud-watts">0</span>
+          <span class="power-w">W</span>
+        </div>
+        <div class="power-right-col">
+          <div class="wkg-pill" id="hud-wkg">0,0 W/kg</div>
+          <div class="power-zone-badge" id="hud-zone">Z1 regeneracja</div>
+        </div>
+      </div>
+      <div class="power-ribbon-track" id="hud-power-ribbon" role="progressbar" aria-label="Strefy mocy Coggana Z1-Z7" title="Strefy wysiłku Coggana (Z1 do Z7)">
+        <span class="ribbon-seg active" data-zone="1" title="Z1: <55% FTP (Aktywna regeneracja)">Z1</span>
+        <span class="ribbon-seg" data-zone="2" title="Z2: 56-75% FTP (Baza tlenowa)">Z2</span>
+        <span class="ribbon-seg" data-zone="3" title="Z3: 76-90% FTP (Tempo)">Z3</span>
+        <span class="ribbon-seg" data-zone="4" title="Z4: 91-105% FTP (Próg FTP)">Z4</span>
+        <span class="ribbon-seg" data-zone="5" title="Z5: 106-120% FTP (VO2 Max)">Z5</span>
+        <span class="ribbon-seg" data-zone="6" title="Z6: 121-150% FTP (Beztlenowa)">Z6</span>
+        <span class="ribbon-seg" data-zone="7" title="Z7: >150% FTP (Neuromoc / Sprint)">Z7</span>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric">
+        <span class="metric-label">Prędkość</span>
+        <span class="metric-val speed-val" id="hud-speed">0,0</span>
+        <span class="metric-sub">km/h</span>
+      </div>
+      <div class="metric metric-cadence">
+        <span class="metric-label">Kadencja</span>
+        <span class="metric-val cad-val" id="hud-cadence">0</span>
+        <span class="metric-sub">obr./min</span>
+        <small class="cadence-coach-pill" id="hud-cadence-coach">W normie</small>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Tętno</span>
+        <span class="metric-val hr-val" id="hud-hr">brak</span>
+        <span class="metric-sub" id="hud-hr-sub">ud./min</span>
+      </div>
+    </div>
+
+    <div class="averages-row">
+      <div class="avg-item">
+        <span>Śr. moc</span>
+        <strong id="hud-avg-watts">0 W</strong>
+      </div>
+      <div class="avg-item">
+        <span>Bieg</span>
+        <strong id="hud-gear" class="gear-badge-val">Bieg 12/24</strong>
+      </div>
+      <div class="avg-item">
+        <span>Dojazd do mety</span>
+        <strong id="hud-eta">00:00</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Center: Distance, Elevation, Remaining, Time & Ghost Gap -->
+  <div id="hud-top-center" class="hud-panel">
+    <div class="center-stat">
+      <span class="stat-label">Dystans</span>
+      <span class="stat-value"><span id="hud-distance">0,00</span> <small>km</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">Przewyższenie</span>
+      <span class="stat-value"><span id="hud-elevation">0</span> <small>m</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">Do mety</span>
+      <span class="stat-value"><span id="hud-remaining">0,00</span> <small>km</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">Czas jazdy</span>
+      <span class="stat-value" id="hud-time">00:00</span>
+    </div>
+    <div class="center-stat ghost-stat" id="ghost-stat-box">
+      <span class="stat-label">Wirtualny rywal</span>
+      <span class="stat-value" id="hud-ghost-gap">00:00</span>
+    </div>
+  </div>
+
+  <!-- Top Right: Gradient, Altitude, Minimap & Nearby Riders -->
+  <div id="hud-top-right" class="hud-panel">
+    <div class="gradient-box">
+      <div class="grade-left">
+        <span class="gradient-label">Nachylenie</span>
+        <div class="altitude-sub"><span id="hud-altitude">0</span> m n.p.m. · <span id="hud-heading">0° N</span> · <span id="hud-wind" class="wind-badge" title="Wiatr (kierunek i siła)"><svg class="ui-icon" aria-hidden="true"><use href="#icon-wind-cross" /></svg>0 km/h</span></div>
+      </div>
+      <span class="gradient-value" id="hud-grade">0,0%</span>
+    </div>
+    <canvas id="minimap-canvas" width="232" height="142" aria-label="Minimapa trasy"></canvas>
+    <div class="nearby-box">
+      <div class="nearby-title">Kolarze na trasie</div>
+      <div id="nearby-list"></div>
+    </div>
+  </div>
+
+  <!-- Bottom: Clean Quick Controls & Large Dual Elevation Profile -->
+  <div id="hud-bottom" class="hud-panel">
+    <div class="controls-bar" id="bottom-controls-bar">
+      <button id="btn-settings" class="btn btn-menu-main" title="Otwórz menu główne, wybór trasy i ustawienia (Esc)">
+        Menu i trasa
+      </button>
+
+      <label class="btn btn-primary" for="gpx-input" tabindex="0" role="button" title="Wgraj plik GPX z dysku (lub przeciągnij na okno)">
+        Wgraj GPX
+      </label>
+      <input type="file" id="gpx-input" name="gpx-input" accept=".gpx,.xml" hidden />
+
+      <button id="btn-camera" class="btn btn-secondary" title="Zmień widok kamery (klawisz C)">
+        Kamera: za kolarzem
+      </button>
+
+      <div class="gear-shifter-bar" title="Wirtualne przerzutki (Q i E)">
+        <button id="btn-gear-down" class="btn-gear" aria-label="Bieg w dół">−</button>
+        <span id="hud-gear-bottom">Bieg 12</span>
+        <button id="btn-gear-up" class="btn-gear" aria-label="Bieg w górę">+</button>
+      </div>
+
+      <div class="sim-controls">
+        <label for="sim-watts">Moc: <strong id="sim-watts-label">180 W</strong></label>
+        <input type="range" id="sim-watts" name="sim-watts" min="0" max="800" value="180" step="5" />
+      </div>
+
+      <button id="btn-session-toggle" class="btn btn-secondary" type="button"><span class="button-label">Rozpocznij jazdę</span></button>
+      <span id="hud-session-status" class="session-state" role="status">Przygotowanie</span>
+      <button id="btn-end-ride" class="btn btn-finish-ride" title="Zakończ trening i zobacz pełne podsumowanie jazdy">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg>
+        Zakończ trening
+      </button>
+
+      <button id="btn-export-fit" class="btn btn-primary" title="Pobierz natywny plik treningowy FIT (Garmin / Strava / Wahoo)">
+        Zapisz FIT
+      </button>
+      <button id="btn-export-tcx" class="btn btn-secondary" title="Pobierz zapis treningu TCX">
+        Zapisz TCX
+      </button>
+    </div>
+
+    <p id="hud-storage-status" class="session-message" role="status" hidden></p>
+    <details class="session-sources">
+      <summary>Źródła danych i sterowanie</summary>
+      <dl class="session-facts"><div><dt>Moc</dt><dd data-source-key="power">Symulacja klawiatury</dd></div><div><dt>Kadencja</dt><dd data-source-key="cadence">Obliczana</dd></div><div><dt>Tętno</dt><dd data-source-key="heart">Brak pulsometru</dd></div><div><dt>Opór</dt><dd data-source-key="control">Brak sterowania BLE</dd></div></dl>
+    </details>
+    <div class="profiles-grid">
+      <div class="profile-box" title="Kliknij w dowolne miejsce na profilu, aby przenieść się na ten kilometr trasy">
+        <div class="profile-label">
+          <span>Profil trasy</span>
+          <span id="climbs-summary-label">Podjazdy: 0</span>
+        </div>
+        <canvas id="elevation-canvas" width="700" height="86" aria-label="Profil wysokości całej trasy"></canvas>
+      </div>
+
+      <div class="profile-box zoom-box" title="Dokładny podgląd nachylenia drogi na najbliższe 1,5 km przed Tobą">
+        <div class="profile-label">
+          <span>Przed Tobą: 1,5 km</span>
+          <span id="upcoming-avg-grade">Śr. 0,0%</span>
+        </div>
+        <canvas id="zoom-elevation-canvas" width="460" height="86" aria-label="Profil nachylenia najbliższych 1,5 km"></canvas>
+      </div>
+    </div>
+
+    <div id="status-bar">
+      Status: <span id="ble-status">Symulacja klawiatury (moc: strzałki, biegi: Q i E, kamera: C)</span>
+      <span id="hud-realism-badge" class="realism-badge realism-muted" title="Status realizmu fizyki trenażera i zPower. Kliknij, aby otworzyć panel urządzeń.">Realizm: Klawiatura</span>
+    </div>
+  </div>
+
+  <!-- Main ride setup -->
+  <div id="settings-modal" class="modal-backdrop menu-scenic-backdrop">
+    <svg class="menu-scenic-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="slonce-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--or-deep-green)" />
+          <stop offset="58%" stop-color="var(--or-forest)" />
+          <stop offset="100%" stop-color="var(--or-sage)" />
+        </linearGradient>
+        <radialGradient id="slonce-glow" cx="50%" cy="34%" r="38%">
+          <stop offset="0%" stop-color="var(--or-yellow)" stop-opacity="0.55" />
+          <stop offset="48%" stop-color="var(--or-yellow-soft)" stop-opacity="0.18" />
+          <stop offset="100%" stop-color="var(--or-deep-green)" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="1440" height="900" fill="url(#slonce-sky)" />
+      <circle cx="720" cy="300" r="460" fill="url(#slonce-glow)" />
+      <circle cx="720" cy="296" r="108" fill="var(--or-yellow)" opacity="0.88" />
+      <path d="M0 610 L210 430 L390 545 L620 350 L835 510 L1080 330 L1290 485 L1440 410 L1440 900 L0 900 Z" fill="var(--or-forest)" opacity="0.78" />
+      <path d="M0 680 L160 540 L340 630 L540 470 L760 615 L980 455 L1190 595 L1440 500 L1440 900 L0 900 Z" fill="var(--or-forest-hover)" opacity="0.92" />
+      <path d="M0 748 L90 660 L135 735 L195 640 L250 740 L320 650 L380 745 L460 658 L520 748 L1440 748 L1440 900 L0 900 Z" fill="var(--or-deep-green)" />
+      <path d="M920 748 L980 652 L1035 742 L1100 635 L1165 742 L1235 648 L1305 742 L1375 660 L1440 748 L1440 900 L920 900 Z" fill="var(--or-deep-green)" />
+      <path d="M520 900 Q650 760 610 675 Q575 600 720 535 Q815 600 785 680 Q755 765 920 900 Z" fill="var(--or-hud-surface)" opacity="0.85" />
+      <path d="M716 900 Q704 765 655 675 Q628 610 720 535" fill="none" stroke="var(--or-yellow)" stroke-width="3" stroke-dasharray="12 10" opacity="0.75" />
+    </svg>
+
+    <div class="modal-shell main-menu-shell" role="dialog" aria-modal="true" aria-labelledby="menu-heading" tabindex="-1" data-menu-view="home">
+      <div class="menu-hero-header">
+        <div class="menu-header-top">
+          <div class="menu-brand"><div>
+            <h1 class="brand-logo-frame brand-logo-menu"><img src="grafika/marka-oskiride/oskiride-logo.png?v=2" alt="OskiRide" width="2103" height="748" /></h1>
+            <p>Twój kompan na każdą trasę.</p>
+          </div></div>
+          <div class="menu-header-actions">
+            <div class="menu-nav-pills" role="tablist" aria-label="Nawigacja menu głównego">
+              <button type="button" id="btn-tab-home" class="btn btn-secondary menu-tab-btn active" data-target-view="home">Start</button>
+              <button type="button" id="btn-tab-play" class="btn btn-secondary menu-tab-btn" data-target-view="play">Graj</button>
+              <button type="button" id="btn-tab-workouts" class="btn btn-secondary menu-tab-btn" data-target-view="workouts">Treningi</button>
+              <button type="button" id="btn-tab-settings" class="btn btn-secondary menu-tab-btn" data-target-view="settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>Ustawienia</button>
+            </div>
+            <button id="btn-settings-close-top" class="btn-icon" aria-label="Zamknij menu" title="Wróć do jazdy (Esc)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg></button>
+          </div>
+        </div>
+        <div class="menu-ble-actions">
+          <button type="button" id="btn-open-device-test" class="btn btn-secondary" aria-controls="menu-device-test-section">Test urządzeń</button>
+          <button id="btn-open-pairing" class="btn btn-secondary btn-devices-main" title="Otwórz panel urządzeń i połączeń"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label">Urządzenia</span></button>
+          <button id="btn-ble-connect" class="btn btn-ble" title="Główny trenażer sterowalny FTMS / Tacx / Wahoo"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="ble-btn-label">Trenażer FTMS</span></button>
+          <button id="btn-power-connect" class="btn btn-secondary" title="Miernik mocy BLE (0x1818 - pedały, korba, pająk)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="power-btn-label">Moc BLE</span></button>
+          <button id="btn-cadence-connect" class="btn btn-secondary" title="Czujnik kadencji i prędkości CSCP (0x1816)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="cadence-btn-label">Kadencja BLE</span></button>
+          <button id="btn-hrm-connect" class="btn btn-secondary" title="Pulsometr BLE (0x180D)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart" /></svg><span class="button-label" id="hrm-btn-label">Pulsometr</span></button>
+          <button id="btn-zwift-connect" class="btn btn-secondary" title="Sparuj kontrolery Zwift Play / Click do wirtualnej zmiany biegów"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-controller" /></svg><span class="button-label" id="zwift-btn-label">Manetki Zwift</span></button>
+        </div>
+      </div>
+
+      <!-- Widok 1: Ekran startowy z dwoma głównymi przyciskami: Graj oraz Ustawienia -->
+      <section id="ride-recovery-panel" class="ride-recovery-panel" aria-label="Przerwana jazda" hidden>
+        <div><strong>Przerwana jazda</strong><p id="ride-recovery-description"></p></div>
+        <div class="recovery-actions"><button id="btn-restore-ride" class="btn btn-primary" type="button">Przywróć</button><button id="btn-discard-ride" class="btn btn-secondary" type="button">Odrzuć zapis</button></div>
+      </section>
+      <p id="ride-storage-status" class="session-message" role="status" hidden></p>
+      <section id="menu-home-section" class="menu-section home-launcher-section" aria-label="Ekran startowy">
+        <div class="home-launcher-banner">
+          <div class="home-launcher-copy">
+            <h2>Gotowy na trening?</h2>
+            <p>Wybierz trasę górską, interwałową albo własny plik GPX, lub dopasuj ustawienia kolarza i trenażera przed startem.</p>
+          </div>
+          <div class="home-primary-split">
+            <button type="button" id="btn-home-play" class="home-action-btn home-action-play">
+              <span class="home-action-head">
+                <strong>Graj</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow" /></svg>
+              </span>
+              <span class="home-action-sub">Wybierz trasę, wgraj GPX i rozpocznij jazdę</span>
+            </button>
+            <button type="button" id="btn-home-settings" class="home-action-btn home-action-settings">
+              <span class="home-action-head">
+                <strong>Ustawienia</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>
+              </span>
+              <span class="home-action-sub">Profil kolarza, FTP, trenażer i grafika 3D</span>
+            </button>
+            <button type="button" id="btn-home-devices" class="home-action-btn home-action-devices" style="grid-column: 1 / -1; margin-top: 8px;">
+              <span class="home-action-head">
+                <strong>Urządzenia i trenażer</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg>
+              </span>
+              <span class="home-action-sub" id="home-devices-status">Trenażer Smart, miernik mocy, presety zPower i kalibracja Spindown</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Widok 2: Wybór trasy i start (Graj) -->
+      <section id="menu-play-section" class="menu-section route-section hidden" aria-labelledby="menu-heading">
+        <div class="menu-section-header"><div><h2 id="menu-heading">Wybierz trasę</h2><p class="section-description">Trasy treningowe lub Twój własny plik GPX.</p></div><span id="active-route-pill" class="active-route-pill">Przełęcz Alpejska (5,2 km)</span></div>
+        <div class="route-cards-grid"><button type="button" class="route-card active" data-preset="mountain" id="card-route-mountain" aria-pressed="true">
+  <span class="route-card-top"><span class="route-category">Górska</span><span class="route-distance">5,2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 41L28 39L48 31L67 34L91 17L110 23L132 5L151 13L175 35L198 39" /></svg>
+  <span class="route-card-title">Przełęcz Alpejska</span>
+  <span class="route-card-desc">Podjazd KOM i szybki zjazd</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Wybrana trasa</span></span>
+</button>
+<button type="button" class="route-card" data-preset="alpedhuez" id="card-route-alpedhuez" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Legenda TdF (HC)</span><span class="route-distance">13,9 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 42L16 40L30 35L44 32L60 26L76 23L92 18L110 15L128 11L146 8L164 5L182 4L198 3" /></svg>
+  <span class="route-card-title">Alpe d'Huez</span>
+  <span class="route-card-desc">21 zakrętów · przebieg na podstawie GPX</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Wybierz trasę</span></span>
+</button>
+<button type="button" class="route-card" data-preset="switchbacks" id="card-route-switchbacks" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Techniczna</span><span class="route-distance">7,5 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 39L24 39L42 16L61 27L83 9L100 20L121 5L143 21L160 17L180 35L198 33" /></svg>
+  <span class="route-card-title">Kręte Serpentyny</span>
+  <span class="route-card-desc">Zakręty i dwa podjazdy</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Wybierz trasę</span></span>
+</button>
+<button type="button" class="route-card" data-preset="rolling" id="card-route-rolling" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Pagórkowata</span><span class="route-distance">5,2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 34L24 18L45 33L67 12L91 30L116 15L140 31L164 11L183 29L198 24" /></svg>
+  <span class="route-card-title">Interwałowa Dolina</span>
+  <span class="route-card-desc">Krótkie podjazdy pod interwały</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Wybierz trasę</span></span>
+</button>
+<button type="button" class="route-card" data-preset="flat" id="card-route-flat" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Płaska</span><span class="route-distance">5,2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 31L29 30L52 28L76 30L102 26L124 27L150 24L173 28L198 27" /></svg>
+  <span class="route-card-title">Płaska Czasówka</span>
+  <span class="route-card-desc">Równe tempo i jazda w grupie</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Wybierz trasę</span></span>
+</button></div>
+        <div class="route-card route-card-gpx" id="card-route-gpx">
+          <div class="upload-route-copy"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upload" /></svg><div><strong>Masz swoją trasę?</strong><p id="gpx-card-filename" role="status">Wgraj GPX z dysku lub przeciągnij plik na okno.</p></div></div>
+          <label for="gpx-input" class="btn btn-secondary route-upload-btn" tabindex="0" role="button">Wgraj GPX</label>
+        </div>
+        <section class="route-library" aria-labelledby="route-library-heading">
+          <div class="route-library-heading"><div><h3 id="route-library-heading">Moje trasy GPX</h3><p id="route-library-count">Zapisane trasy: 0</p></div><button type="button" id="btn-library-save-current" class="btn btn-secondary" disabled>Zapisz bieżącą trasę</button></div>
+          <p id="route-library-status" role="status">Wgraj GPX — poprawna trasa zapisze się w bibliotece.</p>
+          <div class="route-library-tools"><label for="route-library-search">Szukaj trasy<input id="route-library-search" type="search" placeholder="Nazwa trasy" autocomplete="off" /></label><label class="route-library-check"><input id="route-library-favorites" type="checkbox" />Tylko ulubione</label><button type="button" id="btn-library-refresh" class="btn btn-secondary">Odśwież</button></div>
+          <p id="route-library-lock" hidden>Zakończ jazdę lub przywróć neutralny opór po próbie, aby zmienić zapisaną trasę.</p>
+          <ul id="route-library-list" aria-label="Zapisane trasy GPX"></ul>
+        </section>
+        <div class="start-offset-bar">
+          <div class="start-offset-info">
+            <label for="start-km-slider">Miejsce startu <strong id="start-km-label">0,0 km (początek trasy)</strong></label>
+            <small id="menu-route-stats">5,2 km, 1 podjazd</small>
+          </div>
+          <div class="menu-profile-preview-wrap" title="Kliknij w profil, aby wybrać miejsce startu na trasie">
+            <canvas id="menu-elevation-canvas" width="960" height="74" aria-label="Podgląd profilu wysokości wybranej trasy"></canvas>
+          </div>
+          <input type="range" id="start-km-slider" name="start-km-slider" min="0" max="5.2" value="0" step="0.1" />
+        </div>
+      </section>
+
+      <!-- Widok 3: Treningi ustrukturyzowane (.ZWO / .MRC / ERG) -->
+      <section id="menu-workouts-section" class="menu-section workouts-section hidden" aria-labelledby="workouts-heading">
+        <div class="menu-section-header">
+          <div>
+            <h2 id="workouts-heading">Treningi ustrukturyzowane (ERG)</h2>
+            <p class="section-description">Wybierz plan z biblioteki lub wgraj plik ZWO, MRC albo ERG.</p>
+          </div>
+          <div class="workout-actions-header">
+            <label for="workout-file-input" class="btn btn-secondary" tabindex="0" role="button" title="Wgraj plik ZWO, MRC lub ERG z dysku">
+              <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upload" /></svg>Wgraj trening
+            </label>
+            <input type="file" id="workout-file-input" name="workout-file-input" accept=".zwo,.mrc,.erg,.txt,.xml" hidden />
+          </div>
+        </div>
+
+        <div class="workout-presets-grid" id="workout-presets-container">
+          <!-- Wstrzykiwane dynamicznie z WORKOUT_PRESETS -->
+        </div>
+        <p id="workout-import-status" class="workout-import-status" role="status" aria-live="polite" hidden></p>
+
+        <div class="workout-active-panel">
+          <div class="workout-active-info">
+            <span class="workout-active-label">Wybrany trening:</span>
+            <strong id="workout-active-title">Sweet Spot 2×15 min</strong>
+            <span id="workout-active-meta" class="workout-active-meta">Czas trwania: 50 min · 5 bloków · OskiRide Performance</span>
+          </div>
+          <div class="workout-active-controls">
+            <label class="workout-erg-toggle" title="Automatyczne sterowanie oporem trenażera na zadaną moc w watach (FTMS OpCode 0x05)">
+              <input type="checkbox" id="workout-erg-toggle" name="workout-erg-toggle" checked />
+              <span>Tryb ERG (trenażer trzyma moc)</span>
+            </label>
+            <button type="button" id="btn-workout-toggle" class="btn btn-primary">
+              Rozpocznij trening
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Widok 4: Odseparowane Ustawienia jazdy -->
+      <section id="menu-settings-section" class="menu-section setup-section hidden" aria-labelledby="setup-heading">
+        <div class="menu-section-header"><h2 id="setup-heading">Ustawienia jazdy</h2><small>Profil ustaw przed startem. Obraz i opór możesz zmieniać podczas jazdy.</small></div>
+        <div class="settings-logs-entry"><div><strong>Diagnostyka jazdy</strong><p>Połączenia urządzeń, błędy i wydajność — osobny zapis każdej jazdy.</p></div><button type="button" id="btn-open-logs" class="btn btn-secondary" aria-controls="menu-logs-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>Logi</button></div>
+        <div class="settings-grid">
+          <fieldset class="settings-group"><legend>Profil kolarza i sprzęt</legend>
+            <a id="rider-model-studio" class="btn btn-secondary" href="grafika/index.html">Porównaj 4 modele kolarza</a>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="rider-name">Imię lub pseudonim</label><input type="text" id="rider-name" name="rider-name" autocomplete="nickname" maxlength="40" value="OskiRide" /></div>
+              <div class="setting-row"><label for="rider-ftp">FTP <span class="field-unit">W</span></label><input type="number" id="rider-ftp" name="rider-ftp" autocomplete="off" min="80" max="550" value="250" title="Moc progowa do wyznaczania stref wysiłku" /></div>
+              <div class="setting-row"><label for="rider-weight">Masa ciała <span class="field-unit">kg</span></label><input type="number" id="rider-weight" name="rider-weight" autocomplete="off" min="35" max="180" step="0.1" value="75" /></div>
+            </div>
+            <div class="setting-row"><label for="bike-type-select">Rower</label><select id="bike-type-select" name="bike-type-select" class="select-input"><option value="aero" selected>Szosa aero (7,5 kg)</option><option value="tt">Czasowy (8,2 kg)</option><option value="mtb">MTB / gravel (10,2 kg)</option></select></div>
+            <p id="profile-save-status" class="session-message" role="status">Profil zapisuje się po zmianie ustawień.</p>
+            <div class="setting-row"><label for="jersey-color-select">Koszulka</label><select id="jersey-color-select" name="jersey-color-select" class="select-input"><option value="#f97316" selected>Pomarańczowa</option><option value="#facc15">Żółta</option><option value="#ef4444">Czerwona</option><option value="#06b6d4">Błękitna</option><option value="#22c55e">Zielona</option></select></div>
+            <div class="setting-row"><label for="gearing-profile-select">Stopniowanie biegów</label><select id="gearing-profile-select" name="gearing-profile-select" class="select-input"><option value="allaround" selected>Szosowe uniwersalne (50/34, 11-34)</option><option value="climbing">Górskie wspinaczkowe (46/30, 11-36)</option><option value="flat">Płaskie / TT (53/39, 11-25)</option></select></div>
+            <div class="setting-row"><label for="virtual-shifting-select">Wirtualne biegi</label><select id="virtual-shifting-select" name="virtual-shifting-select" class="select-input"><option value="auto" selected>Automatycznie (Zwift Click/Play)</option><option value="always">Zawsze aktywne (Cog / klawisze)</option><option value="off">Wyłączone (fizyczna kaseta)</option></select></div>
+          </fieldset>
+          <fieldset class="settings-group"><legend>Trenażer i opór</legend>
+            <div class="setting-row"><label for="trainer-mode-select">Tryb oporu</label><select id="trainer-mode-select" name="trainer-mode-select" class="select-input"><option value="sim" selected>SIM (według nachylenia)</option><option value="erg">ERG (stała moc)</option></select></div>
+            <div class="setting-row"><label for="trainer-diff">Odwzorowanie podjazdów <strong id="trainer-diff-label">100%</strong></label><input type="range" id="trainer-diff" name="trainer-diff" min="0" max="100" value="100" step="10" title="Jak mocno nachylenie trasy wpływa na opór trenażera" /></div>
+            <div class="setting-row"><label for="downhill-clamp-select">Opór na zjazdach</label><select id="downhill-clamp-select" name="downhill-clamp-select" class="select-input"><option value="-1.5" selected>Komfortowy (min. -1,5%)</option><option value="0.0">Płaski opór (min. 0%)</option><option value="-15.0">Pełny zjazd (do -15%)</option></select></div>
+            <div class="setting-row"><label for="erg-softstart-select">Rampa interwałów ERG</label><select id="erg-softstart-select" name="erg-softstart-select" class="select-input"><option value="3" selected>Łagodny start (rampa 3 s)</option><option value="0">Natychmiastowy przeskok</option></select></div>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="power-smoothing-select">Wygładzanie mocy</label><select id="power-smoothing-select" name="power-smoothing-select" class="select-input"><option value="1">1s (chwilowa)</option><option value="3" selected>3s (zalecane)</option><option value="5">5s (stabilna)</option></select></div>
+              <div class="setting-row"><label for="trainer-responsiveness-select">Czułość oporu</label><select id="trainer-responsiveness-select" name="trainer-responsiveness-select" class="select-input"><option value="smooth">Płynna (1,2%/s)</option><option value="standard" selected>Zbalansowana (2%/s)</option><option value="dynamic">Sportowa (3,8%/s)</option></select></div>
+            </div>
+            <div class="setting-row" style="margin-top: var(--space-xs);"><button type="button" id="btn-ble-universal" class="btn btn-secondary" style="width: 100%; font-size: 12px; padding: 6px 10px;" title="Wyszukaj wszystkie urządzenia Bluetooth LE bez ograniczeń filtrów producenta"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg>Wyszukaj dowolny trenażer (BLE)</button></div>
+          </fieldset>
+          <fieldset class="settings-group"><legend>Obraz, rywal i zPower</legend>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="time-select">Pora dnia</label><select id="time-select" name="time-select" class="select-input"><option value="day" selected>Dzień</option><option value="dynamic">Płynna (dzień ➔ zachód)</option><option value="sunset">Zachód słońca</option><option value="night">Noc</option></select></div>
+              <div class="setting-row"><label for="quality-select">Grafika</label><select id="quality-select" name="quality-select" class="select-input"><option value="eco">Oszczędna</option><option value="medium" selected>Standard</option><option value="ultra">Wysoka</option></select></div>
+            </div>
+            <label class="adaptive-graphics-toggle"><input type="checkbox" id="adaptive-graphics-toggle" checked />Automatycznie dopasuj scenerię i cienie</label><p id="adaptive-graphics-status" class="adaptive-graphics-status" role="status">Automatyczne dopasowanie włączone.</p>
+            <label class="adaptive-graphics-toggle"><input type="checkbox" id="crowd-audio-toggle" checked />Doping kibiców na Alpe d’Huez</label>
+            <div class="setting-row"><label for="crowd-audio-volume">Głośność kibiców <strong id="crowd-audio-volume-label">45%</strong></label><input type="range" id="crowd-audio-volume" min="0" max="100" value="45" step="5" /></div>
+            <p id="crowd-audio-status" class="adaptive-graphics-status" role="status">Doping słychać tylko w pobliżu zakrętu 7 podczas jazdy.</p>
+            <div class="setting-row"><label for="fov-slider">Pole widzenia <strong id="fov-label">62°</strong></label><input type="range" id="fov-slider" name="fov-slider" min="52" max="85" value="62" step="1" /></div>
+            <div class="setting-row"><label for="clean-hud-select">Panel podczas jazdy</label><select id="clean-hud-select" name="clean-hud-select" class="select-input"><option value="full" selected>Przyciski i wykresy</option><option value="minimal">Tylko wykresy</option></select></div>
+            <div class="setting-row"><label for="ghost-mode-select">Wirtualny rywal</label><select id="ghost-mode-select" name="ghost-mode-select" class="select-input"><option value="gpx" selected>Tempo z GPX / bazowe</option><option value="ftp">100% FTP (próg)</option><option value="tempo">85% FTP (tempo)</option><option value="off">Wyłączony</option></select></div>
+            <div class="setting-row"><label for="virtual-power-curve-select">Krzywa zPower (klasyczny)</label><select id="virtual-power-curve-select" name="virtual-power-curve-select" class="select-input"><option value="fluid" selected>Płynowy (Fluid - Kinetic, Elite)</option><option value="magnetic">Magnetyczny (poziom 3)</option><option value="rollers">Rolki kolarskie (Rollers)</option><option value="spinbike">Rower stacjonarny / spin</option></select></div>
+          </fieldset>
+          <select id="preset-select" name="preset-select" class="hidden" aria-label="Wbudowana trasa"><option value="mountain" selected>mountain</option><option value="alpedhuez">alpedhuez</option><option value="switchbacks">switchbacks</option><option value="rolling">rolling</option><option value="flat">flat</option></select>
+        </div>
+      </section>
+
+      <section id="menu-device-test-section" class="menu-section hidden" aria-labelledby="device-check-heading">
+        <div class="device-check-heading"><div><h2 id="device-check-heading" tabindex="-1">Test urządzeń przed jazdą</h2><p id="device-check-trainer">Trenażer niepołączony</p></div><button type="button" id="btn-device-test-back" class="btn btn-secondary">Wróć do menu</button></div>
+        <p id="device-check-availability">Test nie nalicza czasu ani dystansu jazdy.</p>
+        <div class="device-check-actions"><button type="button" id="btn-device-test-pair" class="btn btn-secondary">Połącz urządzenia</button><button type="button" id="btn-check-readings" class="btn btn-primary">Sprawdź odczyty (30 s)</button><button type="button" id="btn-check-stop" class="btn btn-secondary" disabled>Przerwij test</button></div>
+        <p id="device-check-reading-status" role="status">Połącz urządzenia, a następnie rozpocznij test odczytów.</p>
+        <progress id="device-check-progress" value="0" max="30" aria-label="Postęp testu odczytów"></progress>
+        <dl class="device-check-signals">
+          <div id="device-check-power"><dt>Moc</dt><dd><strong id="device-check-power-value">—</strong><span id="device-check-power-status">Nie wykonano testu</span></dd></div>
+          <div id="device-check-cadence"><dt>Kadencja</dt><dd><strong id="device-check-cadence-value">—</strong><span id="device-check-cadence-status">Nie wykonano testu</span></dd></div>
+          <div id="device-check-heart"><dt>Tętno</dt><dd><strong id="device-check-heart-value">—</strong><span id="device-check-heart-status">Nie wykonano testu</span></dd></div>
+        </dl>
+        <div class="device-check-resistance"><h3>Reakcja oporu</h3><p id="device-check-resistance-status" role="status">Próba oporu wymaga połączonego trenażera ze sterowaniem.</p><button type="button" id="btn-check-resistance" class="btn btn-secondary" disabled>Sprawdź reakcję oporu (5 s)</button><button type="button" id="btn-check-neutral" class="btn btn-secondary" hidden>Przywróć neutralny opór</button><div id="device-check-confirmation" class="device-check-actions" hidden><button type="button" id="btn-check-resistance-yes" class="btn btn-primary">Tak, opór się zmienił</button><button type="button" id="btn-check-resistance-no" class="btn btn-secondary">Nie, bez zmiany</button></div></div>
+      </section>
+
+      <section id="menu-logs-section" class="menu-section hidden" aria-labelledby="ride-logs-heading">
+        <div class="ride-logs-heading"><div><h2 id="ride-logs-heading" tabindex="-1">Logi jazd</h2><p id="ride-log-count">Zapisane jazdy: 0</p></div><button type="button" id="btn-logs-back" class="btn btn-secondary">Wróć do ustawień</button></div>
+        <p id="ride-log-status" class="ride-log-status" role="status">Logi są zapisywane lokalnie na tym urządzeniu.</p>
+        <div class="ride-log-actions"><button type="button" id="btn-log-refresh" class="btn btn-secondary">Odśwież</button><button type="button" id="btn-log-export" class="btn btn-secondary" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>Pobierz logi jazdy</button></div>
+        <div class="ride-log-layout"><nav id="ride-log-list" aria-label="Jazdy z logami"></nav><article id="ride-log-detail" aria-label="Logi wybranej jazdy"></article></div>
+      </section>
+
+      <section class="session-preflight" aria-label="Przygotowanie sesji">
+        <p id="session-ready-status" role="status">Przygotowanie</p>
+        <dl class="session-facts"><div><dt>Trasa</dt><dd id="ready-route">Przełęcz Alpejska</dd></div><div><dt>Profil</dt><dd id="ready-profile">OskiRide · 250 W · 75 kg</dd></div><div><dt>Plan</dt><dd id="ready-workout">Jazda swobodna</dd></div></dl>
+        <details class="session-sources"><summary>Źródła danych i sterowanie</summary><dl class="session-facts"><div><dt>Moc</dt><dd data-source-key="power">Symulacja klawiatury</dd></div><div><dt>Kadencja</dt><dd data-source-key="cadence">Obliczana</dd></div><div><dt>Tętno</dt><dd data-source-key="heart">Brak pulsometru</dd></div><div><dt>Opór</dt><dd data-source-key="control">Brak sterowania BLE</dd></div></dl></details>
+      </section>
+      <div class="menu-footer-actions">
+        <div class="menu-footer-secondary">
+          <button id="btn-restart-route" class="btn btn-secondary"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-restart" /></svg>Od początku</button>
+          <button id="btn-open-summary" class="btn btn-secondary" type="button">Podsumowanie i historia</button>
+          <span class="keyboard-hint"><kbd>Esc</kbd> Wróć do jazdy</span>
+        </div>
+        <button id="btn-settings-close" class="btn btn-play-big"><span class="button-label">Rozpocznij jazdę</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow" /></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finish & Ride Summary Modal -->
+  <div id="finish-modal" class="modal-backdrop hidden">
+    <div class="modal-shell summary-modal-shell" role="dialog" aria-modal="true" aria-labelledby="finish-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="finish-heading">Podsumowanie treningu</h2>
+          <p id="finish-route-name" class="finish-subtitle">Przełęcz Alpejska</p>
+        </div>
+        <button id="btn-finish-close-top" class="btn-icon" aria-label="Zamknij podsumowanie">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <div class="finish-stats-grid">
+        <div class="finish-stat">
+          <span>Czas jazdy</span>
+          <strong id="finish-time">00:00</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Dystans i przewyższenie</span>
+          <strong id="finish-dist">0,00 km / 0 m</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Średnia moc i energia</span>
+          <strong id="finish-watts">0 W (0,0 W/kg)</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Moc znormalizowana i obciążenie</span>
+          <strong id="finish-np-tss">NP 0 W · IF 0,00 · TSS 0</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Efektywność (VI / EF)</span>
+          <strong id="finish-vi-ef">VI 1,00 · EF —</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Śr. / Maks. kadencja i tętno</span>
+          <strong id="finish-cadence-hr">0 / 0 obr./min · — ud./min</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Profil / Fenotyp wysiłku</span>
+          <strong id="finish-phenotype">All-Rounder</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Wynik z rywalem</span>
+          <strong id="finish-ghost">brak</strong>
+        </div>
+      </div>
+
+      <div class="summary-analytics-grid">
+        <section class="summary-panel" aria-labelledby="zones-heading">
+          <div class="summary-panel-header">
+            <h3 id="zones-heading">Czas w strefach mocy Coggana (Z1 do Z7)</h3>
+            <small id="summary-ftp-label">Względem FTP 250 W</small>
+          </div>
+          <div id="finish-zones-list" class="zones-bars-list"></div>
+        </section>
+
+        <section class="summary-panel" aria-labelledby="peaks-heading">
+          <div class="summary-panel-header">
+            <h3 id="peaks-heading">Krzywa mocy i rekordy MMP</h3>
+            <small>Najlepsza średnia moc na odcinku czasu</small>
+          </div>
+          <div class="peaks-grid">
+            <div class="peak-box">
+              <span class="peak-duration">Pmax (Sprint maks.)</span>
+              <strong id="peak-max">0 W</strong>
+              <small id="peak-max-wkg">0,0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">5 sekund (sprint)</span>
+              <strong id="peak-5s">0 W</strong>
+              <small id="peak-5s-wkg">0,0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">15 sekund (atak)</span>
+              <strong id="peak-15s">0 W</strong>
+              <small id="peak-15s-wkg">0,0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">1 minuta (anaerobowa)</span>
+              <strong id="peak-1m">0 W</strong>
+              <small id="peak-1m-wkg">0,0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">5 minut (VO2max)</span>
+              <strong id="peak-5m">0 W</strong>
+              <small id="peak-5m-wkg">0,0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">20 minut (próg FTP)</span>
+              <strong id="peak-20m">0 W</strong>
+              <small id="peak-20m-wkg">0,0 W/kg</small>
+            </div>
+          </div>
+          <div class="mmp-chart-container" style="margin-top: var(--space-xs);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:11px; font-weight:600; color:var(--or-ink);">Krzywa Power Duration (Pmax, 5s – 20m)</span>
+              <span id="mmp-ftp-ref" style="font-size:11px; color:var(--or-forest); font-weight:600;">Linia odniesienia FTP</span>
+            </div>
+            <canvas id="finish-mmp-canvas" style="width:100%; height:110px; display:block; border-radius:6px; background:var(--or-sand); border:1px solid var(--or-border);" aria-label="Wykres krzywej mocy MMP"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <section class="summary-panel finish-nutrition-panel" aria-labelledby="nutrition-heading" style="margin-bottom: var(--space-md);">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="nutrition-heading">Bilans metaboliczny i regeneracja</h3>
+            <small>Szacowane zużycie substratów energetycznych oraz rekomendacja uzupełnienia</small>
+          </div>
+          <span id="nutrition-total-energy" class="badge-tag" style="background: var(--or-tag-tech-bg); color: var(--or-tag-tech-ink); font-weight: 700; padding: 2px 8px; border-radius: 4px;">0 kcal / 0 kJ</span>
+        </div>
+        <div class="nutrition-grid">
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Węglowodany (Glikogen)</span>
+            <strong id="nutrition-carbs" class="nutrition-val">0 g</strong>
+            <small id="nutrition-carbs-kcal">0 kcal (~0%)</small>
+          </div>
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Spalony tłuszcz</span>
+            <strong id="nutrition-fat" class="nutrition-val">0 g</strong>
+            <small id="nutrition-fat-kcal">0 kcal (~0%)</small>
+          </div>
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Szacowane nawodnienie</span>
+            <strong id="nutrition-sweat" class="nutrition-val">0,0 L</strong>
+            <small>Utrata płynów / pot</small>
+          </div>
+          <div class="nutrition-card nutrition-tip-card">
+            <span class="nutrition-card-label">Rekomendacja dietetyczna OskiRide</span>
+            <p id="nutrition-tip-text" class="nutrition-tip-text">Uzupełnij węglowodany i elektrolity po wysiłku.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-panel finish-telemetry-panel" aria-labelledby="telemetry-chart-heading" style="margin-bottom: var(--space-md);">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="telemetry-chart-heading">Przebieg treningu (Moc, Tętno i Profil trasy)</h3>
+            <small>Wykres telemetryczny z zarejestrowanych próbek jazdy</small>
+          </div>
+          <div class="chart-legend" style="display:flex; gap:12px; font-size:11px; color:var(--or-muted); align-items:center;">
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#F2C94C; display:inline-block;"></span>Moc (W)</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#ef4444; display:inline-block;"></span>Tętno (ud./min)</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#38bdf8; display:inline-block;"></span>Prędkość</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#557347; display:inline-block;"></span>Profil (+m)</span>
+          </div>
+        </div>
+        <canvas id="finish-telemetry-canvas" width="810" height="150" style="width:100%; height:auto; display:block; border-radius:4px; background:var(--or-surface);" aria-label="Wykres przebiegu mocy i tętna"></canvas>
+      </section>
+
+      <section class="summary-panel history-panel" aria-labelledby="history-heading">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="history-heading">Historia zapisanych treningów</h3>
+            <small id="history-status-label">Zapisane w pamięci przeglądarki, możesz wyeksportować dowolny trening do FIT lub TCX</small>
+          </div>
+          <button id="btn-save-ride-history" class="btn btn-secondary" type="button">Zapisz bieżący trening w historii</button>
+        </div>
+        <div id="ride-history-list" class="ride-history-list"></div>
+      </section>
+
+      <div class="finish-actions">
+        <button id="btn-finish-fit" class="btn btn-primary" title="Pobierz plik binarny FIT z pełną telemetrią (moc, tętno, kadencja, GPS)">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>
+          Pobierz FIT
+        </button>
+        <button id="btn-finish-tcx" class="btn btn-secondary" title="Pobierz plik treningowy TCX (format XML)">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>
+          Pobierz TCX
+        </button>
+        <button id="btn-finish-strava" class="btn btn-strava" type="button" title="Otwórz stronę przesyłania aktywności w portalu Strava (strava.com/upload/select)">
+          Przejdź do Stravy ↗
+        </button>
+        <button id="btn-finish-close" class="btn btn-secondary">Wróć do menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ekran wyboru urządzeń w stylu Zwift (Device Pairing Modal) -->
+  <div id="pairing-modal" class="modal-backdrop hidden">
+    <div class="modal-shell pairing-modal-shell" role="dialog" aria-modal="true" aria-labelledby="pairing-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="pairing-heading">Sparowane urządzenia</h2>
+          <p class="finish-subtitle">Wybierz trenażer Smart, miernik mocy, model trenażera zPower i pulsometr</p>
+        </div>
+        <button id="btn-pairing-close-top" class="btn-icon" aria-label="Zamknij parowanie">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <!-- Pasek Realizmu Fizyki -->
+      <div id="pairing-realism-banner" class="realism-banner realism-muted" aria-live="polite">
+        <div class="realism-banner-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bolt" /></svg></div>
+        <div class="realism-banner-info">
+          <strong id="pairing-realism-title">Realizm fizyki: Symulacja klawiatury</strong>
+          <p id="pairing-realism-desc">Połącz trenażer Smart lub czujnik z profilem zPower, aby włączyć autentyczny opór i fizykę 3D.</p>
+        </div>
+        <span id="pairing-realism-pill" class="realism-pill">Klawiatura</span>
+      </div>
+
+      <!-- Kafelki 4 urządzeń (Zwift Style Grid) -->
+      <div class="pairing-grid">
+        <!-- 1. Trenażer Smart / Kontrola oporu -->
+        <div class="device-card" id="card-dev-trainer">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trainer" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Opór i nachylenie</span>
+              <strong class="device-title">Trenażer Smart</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-trainer">Niepołączono</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-trainer">Brak aktywnego trenażera</div>
+            <div class="device-conn-sub" id="sub-dev-trainer">FTMS · Tacx FE-C · Wahoo Direct</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-trainer" class="btn btn-secondary btn-pair">Szukaj trenażera</button>
+            <button type="button" id="btn-spindown-open" class="btn btn-secondary btn-spindown" title="Kalibracja wybiegu koła zamachowego (Spindown)">
+              <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg> Kalibruj
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Pomiar mocy (Watty) -->
+        <div class="device-card" id="card-dev-power">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bolt" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Pomiar bezpośredni</span>
+              <strong class="device-title">Miernik mocy</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-power">Niepołączono</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-power">Brak miernika mocy</div>
+            <div class="device-conn-sub" id="sub-dev-power">Pedały (Assioma, Rally) · Korba (Stages, 4iiii, Quarq)</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-power" class="btn btn-secondary btn-pair">Szukaj miernika</button>
+          </div>
+        </div>
+
+        <!-- 3. Prędkość i Kadencja / zPower dla trenażerów klasycznych -->
+        <div class="device-card" id="card-dev-speed">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speed" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Trenażer klasyczny / Czujnik</span>
+              <strong class="device-title">Prędkość & zPower</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-speed">Niepołączono</span>
+          </div>
+          <div class="device-card-body">
+            <label for="pairing-zpower-select" class="device-field-label">Model trenażera (Krzywa zPower):</label>
+            <select id="pairing-zpower-select" name="pairing-zpower-select" class="select-input zpower-select">
+              <option value="none">Brak profilu (Niekompatybilny z realizmem)</option>
+              <optgroup label="Tacx">
+                <option value="tacx_blue_matic">Tacx Blue Matic (manetka: poz. 3)</option>
+                <option value="tacx_blue_motion">Tacx Blue Motion (manetka: poz. 4)</option>
+                <option value="tacx_booster">Tacx Booster (manetka: poz. 3)</option>
+                <option value="tacx_satori">Tacx Satori Pro (manetka: poz. 3)</option>
+              </optgroup>
+              <optgroup label="Elite">
+                <option value="elite_novo_force">Elite Novo Force (manetka: poz. 3)</option>
+                <option value="elite_qubo_mag">Elite Qubo Power Mag (manetka: poz. 3)</option>
+                <option value="elite_qubo_fluid">Elite Qubo Fluid (olejowy)</option>
+              </optgroup>
+              <optgroup label="Kurt Kinetic">
+                <option value="kinetic_road_machine">Kurt Kinetic Road Machine (płynowy)</option>
+                <option value="kinetic_rock_roll">Kurt Kinetic Rock and Roll</option>
+              </optgroup>
+              <optgroup label="Decathlon / Van Rysel">
+                <option value="decathlon_inride_100">B'Twin / Van Rysel In'Ride 100 (manetka: poz. 3)</option>
+                <option value="decathlon_inride_500">B'Twin / Van Rysel In'Ride 500 (olejowy)</option>
+              </optgroup>
+              <optgroup label="Saris / CycleOps">
+                <option value="saris_fluid2">Saris / CycleOps Fluid2 (płynowy)</option>
+                <option value="saris_mag">Saris / CycleOps Mag (manetka: poz. 3)</option>
+              </optgroup>
+              <optgroup label="Minoura">
+                <option value="minoura_magride">Minoura MagRide 60/80 (manetka: poz. 3)</option>
+              </optgroup>
+              <optgroup label="Uniwersalne">
+                <option value="fluid" selected>Trenażer płynowy uniwersalny (Fluid)</option>
+                <option value="magnetic">Trenażer magnetyczny uniwersalny (poziom 3)</option>
+                <option value="rollers">Rolki kolarskie szosowe (Rollers)</option>
+                <option value="spinbike">Rower stacjonarny / spinningowy</option>
+              </optgroup>
+            </select>
+            <div class="device-setting-hint" id="pairing-zpower-hint">Opór hydrauliczny proporcjonalny do prędkości (v³)</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-speed" class="btn btn-secondary btn-pair">Szukaj czujnika</button>
+          </div>
+        </div>
+
+        <!-- 4. Pulsometr (Tętno) -->
+        <div class="device-card" id="card-dev-heart">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Biometria</span>
+              <strong class="device-title">Pulsometr</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-heart">Niepołączono</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-heart">Brak pulsometru</div>
+            <div class="device-conn-sub" id="sub-dev-heart">Standard BLE Heart Rate (Polar, Garmin, Wahoo, Magene)</div>
+            <div class="device-setting-hint" style="margin-top: 6px;">Pulsometr optyczny na ramię lub pasek piersiowy BLE</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-heart" class="btn btn-secondary btn-pair">Szukaj pulsometru</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dolne akcje parowania -->
+      <div class="pairing-footer">
+        <button type="button" id="btn-pairing-universal" class="btn btn-secondary" title="Wyszukaj dowolne urządzenia Bluetooth bez ograniczeń">
+          Tryb uniwersalny BLE (Szukaj wszystkiego)
+        </button>
+        <button type="button" id="btn-pairing-close" class="btn btn-play-big">
+          Gotowe / Wróć do jazdy
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Kalibracji Spindown (FTMS / Wybieg koła zamachowego) -->
+  <div id="spindown-modal" class="modal-backdrop hidden">
+    <div class="modal-shell spindown-modal-shell" role="dialog" aria-modal="true" aria-labelledby="spindown-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="spindown-heading">Kalibracja trenażera (Spindown)</h2>
+          <p class="finish-subtitle" id="spindown-subtitle">Korekta tarcia paska i łożysk koła zamachowego dla idealnej dokładności watów</p>
+        </div>
+        <button id="btn-spindown-close-top" class="btn-icon" aria-label="Zamknij kalibrację">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <div class="spindown-content">
+        <!-- Faza 1: Przygotowanie -->
+        <div id="spindown-step-prep" class="spindown-step">
+          <div class="spindown-instruction-card">
+            <h3>Wskazówki przed rozpoczęciem:</h3>
+            <ul>
+              <li><strong>Rozgrzewka:</strong> Trenażer powinien popracować przez ok. 8–10 minut, aby pasek i łożyska osiągnęły temperaturę roboczą.</li>
+              <li><strong>Opona (trenażery z rolką):</strong> Sprawdź ciśnienie (7–8 bar) oraz siłę docisku rolki.</li>
+              <li><strong>Przebieg:</strong> Rozpędzisz trenażer do <strong>37,0 km/h</strong>, a następnie całkowicie puścisz pedały.</li>
+            </ul>
+          </div>
+          <button type="button" id="btn-spindown-start" class="btn btn-play-big" style="width: 100%; margin-top: var(--space-md);">
+            Rozpocznij kalibrację
+          </button>
+        </div>
+
+        <!-- Faza 2 i 3: Rozpędzanie i wybieg (Spinup & Coastdown) -->
+        <div id="spindown-step-active" class="spindown-step hidden">
+          <div class="spindown-phase-title" id="spindown-phase-title">Rozpędź trenażer do 37 km/h</div>
+          <div class="spindown-gauge-wrap">
+            <div class="spindown-speed-display">
+              <span id="spindown-current-speed">0,0</span> <small>km/h</small>
+            </div>
+            <div class="spindown-target-text">Docelowa: 37,0 km/h</div>
+            <div class="spindown-bar-track">
+              <div id="spindown-bar-fill" class="spindown-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div id="spindown-prompt" class="spindown-prompt" aria-live="polite" aria-atomic="true">Pedałuj mocno…</div>
+          <button type="button" id="btn-spindown-cancel" class="btn btn-secondary" style="width: 100%; margin-top: var(--space-md);">
+            Anuluj kalibrację
+          </button>
+        </div>
+
+        <!-- Faza 4: Sukces -->
+        <div id="spindown-step-success" class="spindown-step hidden">
+          <div class="spindown-success-card">
+            <div class="success-icon">✓</div>
+            <h3>Kalibracja zakończona sukcesem!</h3>
+            <p>Trenażer został pomyślnie skalibrowany. Współczynnik oporu zaktualizowany.</p>
+            <div class="spindown-result-stat">
+              <span>Zmierzony czas wybiegu:</span>
+              <strong id="spindown-measured-time">14,2 s</strong>
+            </div>
+          </div>
+          <button type="button" id="btn-spindown-finish" class="btn btn-play-big" style="width: 100%; margin-top: var(--space-md);">
+            Zatwierdź i wróć
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js?v=20261030-corners"></script>
+</body>
+</html>

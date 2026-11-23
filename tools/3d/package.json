@@ -1,0 +1,23 @@
+{
+  "name": "oskiride-3d-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local GLB inspection, validation and optimization tools for OskiRide",
+  "scripts": {
+    "inspect": "gltf-transform inspect",
+    "validate": "gltf-transform validate",
+    "optimize": "gltf-transform optimize",
+    "browser": "playwright-cli",
+    "build:cyclists": "node build-cyclists.mjs",
+    "validate:cyclists": "node validate-models.mjs",
+    "test:pedalling": "node verify-pedalling.mjs"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "4.5.1",
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
+    "@playwright/cli": "0.1.22",
+    "gltf-validator": "2.0.0-dev.3.10",
+    "three": "0.160.0"
+  }
+}

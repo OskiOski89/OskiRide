@@ -1,0 +1,6 @@
+Mode: built-in image_gen; transparent background; image edit.
+Edit target: previous logo, preserved in warianty/oskiride-terakota.png.
+Recolor ONLY the existing OskiRide logo. Preserve the OR monogram, all letter shapes, typography, spacing, relative sizes, composition and transparent background. Exact text: OskiRide.
+Left OR symbol: flat sunny warm yellow #F2C94C, clearly yellow rather than orange. Complete wordmark: deep forest green #234C3B.
+Clean flat colors, smooth edges. No orange, terracotta, extra elements, strokes, effects, shadows or gradients. Maintain source aspect ratio and transparent margins.
+Purpose: friendly warm cycling companion identity distinct from orange sports brands, for later vectorization and 3D extrusion. Output is PNG, not a print-ready model.

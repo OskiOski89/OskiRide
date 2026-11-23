@@ -1,0 +1,66 @@
+.trainer-connection-indicator {
+  --trainer-connected: #65D08A;
+  position: fixed;
+  top: 6px;
+  right: 6px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--or-hud-border);
+  border-radius: 50%;
+  background: var(--or-hud-inset);
+  cursor: pointer;
+}
+.trainer-connection-indicator span { width: 12px; height: 12px; border-radius: 50%; background: var(--or-dark-muted); }
+.trainer-connection-indicator[data-state="connected"] span { background: var(--trainer-connected); }
+.trainer-connection-indicator[data-state="connecting"] span { background: var(--or-yellow); }
+.trainer-connection-indicator[data-state="lost"] span { background: var(--or-hr-rose); }
+.trainer-connection-indicator:hover { border-color: var(--or-cream); }
+.trainer-connection-indicator:focus-visible { outline: 2px solid var(--or-yellow); outline-offset: 2px; }
+body:has(#settings-modal:not(.hidden)) .trainer-connection-indicator,
+body:has(#pairing-modal:not(.hidden)) .trainer-connection-indicator { visibility: hidden; }
+.settings-logs-entry, .ride-logs-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); }
+.settings-logs-entry { padding-block: var(--space-md); border-block: 1px solid var(--or-border); margin-bottom: var(--space-lg); }
+.settings-logs-entry p, .ride-logs-heading p { margin: var(--space-2xs) 0 0; color: var(--or-muted); font-size: var(--text-sm); }
+.settings-logs-entry .btn { flex-shrink: 0; }
+.main-menu-shell[data-menu-view="logs"] .session-preflight,
+.main-menu-shell[data-menu-view="logs"] .menu-ble-actions,
+.main-menu-shell[data-menu-view="logs"] #ride-recovery-panel,
+.main-menu-shell[data-menu-view="logs"] #ride-storage-status,
+.main-menu-shell[data-menu-view="logs"] .menu-footer-actions { display: none; }
+.ride-log-status { color: var(--or-muted); font-size: var(--text-sm); margin: var(--space-md) 0; }
+.ride-log-status.log-storage-error { color: var(--or-error); }
+.ride-log-actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+.ride-log-layout { display: grid; grid-template-columns: minmax(190px, 240px) minmax(0, 1fr); gap: var(--space-lg); }
+#ride-log-list { display: flex; flex-direction: column; gap: var(--space-2xs); align-self: start; }
+.ride-log-choice { display: flex; flex-direction: column; gap: var(--space-2xs); padding: var(--space-sm); text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--or-ink); cursor: pointer; font: inherit; overflow-wrap: anywhere; }
+.ride-log-choice strong { font-size: var(--text-sm); }
+.ride-log-choice span, .ride-log-choice small { font-size: var(--text-xs); color: var(--or-muted); font-variant-numeric: tabular-nums; }
+.ride-log-choice:hover { background: var(--or-card-hover); }
+.ride-log-choice[aria-pressed="true"] { background: var(--or-sand); border-color: var(--or-input-border); }
+.ride-log-choice:focus-visible { outline: 2px solid var(--or-forest); outline-offset: 2px; }
+#ride-log-detail { min-width: 0; }
+#ride-log-detail h3 { margin: 0 0 var(--space-xs); overflow-wrap: anywhere; font-size: var(--text-section); }
+.ride-log-meta { font-size: var(--text-sm); color: var(--or-muted); }
+.ride-log-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: var(--space-md) 0 var(--space-lg); }
+.ride-log-facts dt { font-size: var(--text-xs); color: var(--or-muted); }
+.ride-log-facts dd { margin: var(--space-2xs) 0 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.ride-log-table-scroll { overflow-x: auto; margin-top: var(--space-sm); }
+.ride-log-table { width: 100%; border-collapse: collapse; text-align: left; font-size: var(--text-sm); }
+.ride-log-table th, .ride-log-table td { padding: var(--space-sm) var(--space-xs); vertical-align: top; border-bottom: 1px solid var(--or-border); }
+.ride-log-table th { color: var(--or-muted); font-size: var(--text-xs); font-weight: 600; }
+.ride-log-table td:first-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ride-log-table td:last-child { width: 100%; overflow-wrap: anywhere; }
+.ride-log-table tr[data-level="error"] td { color: var(--or-error); }
+.ride-log-table details summary { cursor: pointer; }
+.ride-log-table summary:focus-visible { outline: 2px solid var(--or-forest); outline-offset: 2px; }
+.ride-log-table pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: var(--space-sm); background: var(--or-sand); color: var(--or-ink); font-size: 12px; line-height: 1.5; tab-size: 2; }
+@media (max-width: 700px) {
+  .ride-log-layout { grid-template-columns: minmax(0, 1fr); }
+  #ride-log-list { max-height: 210px; overflow-y: auto; border-bottom: 1px solid var(--or-border); padding-bottom: var(--space-sm); }
+  .ride-logs-heading { align-items: flex-start; flex-direction: column; }
+  .ride-log-table th, .ride-log-table td { padding: var(--space-xs) var(--space-2xs); font-size: 12px; }
+}

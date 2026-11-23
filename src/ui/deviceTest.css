@@ -1,0 +1,32 @@
+.trainer-pause-banner { display: flex; align-items: center; gap: var(--space-md); max-width: 600px; padding: var(--space-sm) var(--space-md); background: var(--or-hud-surface); border: 1px solid var(--or-yellow); border-radius: 12px; color: var(--or-cream); }
+.trainer-pause-banner[hidden] { display: none; }
+.trainer-pause-banner strong { font-size: var(--text-md); }
+.trainer-pause-banner p { margin: var(--space-2xs) 0 0; font-size: var(--text-sm); color: var(--or-dark-muted); }
+.trainer-pause-banner .btn { flex-shrink: 0; pointer-events: auto; }
+.trainer-pause-banner [hidden], #menu-device-test-section [hidden] { display: none; }
+.device-check-heading { display: flex; align-items: start; justify-content: space-between; gap: var(--space-md); }
+.device-check-heading h2 { margin-top: 0; }
+.device-check-heading p, #device-check-availability { color: var(--or-muted); font-size: var(--text-sm); }
+.device-check-actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block: var(--space-md); }
+.device-check-actions[hidden] { display: none; }
+#device-check-progress { width: 100%; height: 8px; accent-color: var(--or-forest); }
+.device-check-signals { margin-block: var(--space-md) var(--space-lg); }
+.device-check-signals > div { display: grid; grid-template-columns: minmax(90px, 1fr) 3fr; gap: var(--space-md); padding-block: var(--space-md); border-bottom: 1px solid var(--or-border); }
+.device-check-signals dt { font-weight: 600; }
+.device-check-signals dd { margin: 0; display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-xs); font-variant-numeric: tabular-nums; }
+.device-check-signals dd span { font-size: var(--text-sm); color: var(--or-muted); }
+.device-check-signals [data-result="pass"] dd span { color: var(--or-forest); }
+.device-check-resistance { margin-top: var(--space-lg); padding-top: var(--space-md); border-top: 1px solid var(--or-border); }
+.device-check-resistance h3 { font-size: var(--text-section); }
+.device-check-resistance p { max-width: 70ch; line-height: 1.5; }
+#device-check-resistance-status[data-result="error"], #device-check-resistance-status[data-result="fail"] { color: var(--or-error); }
+.main-menu-shell[data-menu-view="device-test"] .session-preflight,
+.main-menu-shell[data-menu-view="device-test"] .menu-ble-actions,
+.main-menu-shell[data-menu-view="device-test"] #ride-storage-status,
+.main-menu-shell[data-menu-view="device-test"] .menu-footer-actions,
+.main-menu-shell[data-menu-view="device-test"] #ride-recovery-panel { display: none; }
+@media(max-width:700px) {
+  .device-check-heading, .trainer-pause-banner { flex-direction: column; align-items: start; }
+  .device-check-signals > div { grid-template-columns: 90px minmax(0,1fr); gap: var(--space-xs); }
+  .device-check-signals dd { flex-direction: column; }
+}

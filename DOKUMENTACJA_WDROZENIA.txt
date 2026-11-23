@@ -1,0 +1,749 @@
+================================================================================
+                    SZCZEGOLOWA DOKUMENTACJA WDROZENIA PROJEKTU
+                             OSKIRIDE 3D CYCLING SIMULATOR
+================================================================================
+Data opracowania: 27 pazdziernika 2026 r.
+Autor wdrozenia : Antigravity (Google DeepMind - Advanced Agentic Coding)
+Projekt         : OskiRide (Symulator kolarski 3D z obsluga GPX, BLE i Zwift Cog)
+Format dokumentu: Chronologiczny raport techniczny krok po kroku
+================================================================================
+
+
+SPIS TRESCI
+--------------------------------------------------------------------------------
+1. Wstep i cel prac
+2. Krok 1: Identyfikacja i analiza potrzeb sprzetowych (MySWITCH i BLE)
+3. Krok 2: Analiza osprzetu fizycznego uzytkownika (Zwift Cog v2 + Zwift Play)
+4. Krok 3: Analiza i inzynieria wsteczna protokolu Bluetooth Low Energy (BLE)
+5. Krok 4: Implementacja dedykowanego modulu ZwiftController (src/ble/zwiftController.js)
+6. Krok 5: Rozbudowa kontrolera trenazera FTMS (src/ble/trainerController.js)
+7. Krok 6: Integracja z interfejsem uzytkownika i powloka Electron (HTML / CSS / JS)
+8. Krok 7: Zwiekszenie realizmu - Faza 1 (Tabela 24 biegow, Grade Smoothing, ISA, Inercja)
+9. Krok 8: Zwiekszenie realizmu - Faza 2 (Szum wiatru, Pochylenie w zakretach, Analityka NP/TSS)
+10. Krok 9: Procedura testowa i weryfikacja automatyczna Playwright
+11. Krok 10: Maksymalizacja realizmu tras GPX i geometrii 3D
+12. Krok 11: Realizm scenerii 3D, Kokpitu Di2, Stref Tetna i Wykresu Mety (Opcje 2, 3, 4)
+13. Krok 12: Pakiet Realizmu 1-5 i bezwarunkowy brak wirtualnych hamulcow
+14. Krok 13: Zaawansowane usprawnienia lacznosci Rider - Trenazer Smart (FTMS 1-4)
+15. Krok 14: Pliki dokumentacji i struktura repozytorium
+16. Podsumowanie i instrukcja uzytkowania
+
+
+================================================================================
+1. WSTEP I CEL PRAC
+================================================================================
+Glownym celem zadania byla pelna, bezposrednia integracja bezprzewodowych manetek
+rowerowych Zwift Play oraz Zwift Click z aplikacja OskiRide przy wykorzystaniu
+standardu Web Bluetooth API, bez koniecznosci uruchamiania jakichkolwiek zewnetrznych
+programow posredniczacych w tle (typu MySWITCH czy QZ).
+
+Kluczowe zalozenia projektowe zdefiniowane przez uzytkownika:
+1. Posiadany sprzet: pojedyncza zebatka Zwift Cog v2 na bębenku trenazera oraz
+   dwa bezprzewodowe kontrolery Zwift Play montowane pod klamkomanetkami na kierownicy.
+2. Dwa autonomiczne tryby jazdy:
+   - Tryb ze sparowanym kontrolerem (Zwift Cog): lancuch pozostaje na pojedynczej
+     zebatce, biegi zmieniane sa przyciskami +/- na kierownicy, a trenazer FTMS
+     w czasie rzeczywistym koryguje opor, emulujac 24 biegi szosowe.
+   - Tryb bez sparowanego kontrolera: klasyczna jazda ze standardowa wielorzedowa
+     kaseta, gdzie trenazer symuluje wprost 1:1 nachylenie trasy z GPX, a kolarz
+     zmienia przelozenia mechanicznie klamkomanetkami w rowerze.
+3. Maksymalny realizm fizyczny:
+   - Dokladne odwzorowanie masy ciala i masy roweru.
+   - Realistyczna rampa oporu trenazera chroniaca stawy kolanowe.
+   - Zmienna gestosc powietrza zalezna od wysokosci n.p.m. na trasach gorskich.
+   - Bezwladnosc obrotowa kol i naturalny wybieg (coasting).
+   - Dynamiczny tunel aerodynamiczny (drafting) za rywalami.
+   - Dynamiczny szum pedu wiatru w Web Audio API.
+   - Pochylanie roweru i kolarza w zakretach.
+   - Zawodowa analityka mocy: Normalized Power (NP), IF i TSS wg dra Coggana.
+
+
+================================================================================
+2. KROK 1: IDENTYFIKACJA I ANALIZA POTRZEB SPRZETOWYCH (MYSWITCH I BLE)
+================================================================================
+Dzialanie:
+Uzytkownik zapytal o program "Myswitch" do sterowania przyciskami.
+
+Wykonana analiza:
+1. Zidentyfikowano aplikacje "MySWITCH" (dostepna w Microsoft Store dla Windows 10/11).
+   Jest to niezalezne narzedzie typu bridge, ktore laczy sie przez BLE z manetkami
+   Zwift Click / Play i tlumaczy wcisniecia przyciskow na komendy wirtualnej zmiany
+   biegow lub klawiszy dla innych platform (np. MyWhoosh, indieVelo) za pomoca
+   protokolu OpenBikeControl.
+2. Zbadano architekture OskiRide:
+   - Aplikacja dziala w powloce Electron na silniku Chromium z odblokowanym
+     interfejsem Web Bluetooth API:
+     app.commandLine.appendSwitch('enable-experimental-web-platform-features');
+     app.commandLine.appendSwitch('enable-web-bluetooth');
+3. Wniosek inzynieryjny:
+   OskiRide jest w stanie bezposrednio nawiazac polaczenie BLE z manetkami Zwift,
+   dostarczajac natywne, bezopoznieniowe doswiadczenie w 100% zintegrowane w grze,
+   calkowicie eliminujac potrzebe instalowania i wlaczania aplikacji MySWITCH w tle.
+
+
+================================================================================
+3. KROK 2: ANALIZA OSPRZETU FIZYCZNEGO UZYTKOWNIKA
+================================================================================
+Dzialanie:
+Uzytkownik przeslal zdjecie posiadanego zestawu osprzetu kolarskiego.
+
+Szczegolowa identyfikacja komponentow ze zdjecia:
+1. Zwift Cog v2 (gora zdjecia):
+   - Pomaranczowa obudowa z pojedyncza stalowa zebatka (14T) montowana na bebenek
+     trenazera Smart (Hyperglide) zamiast tradycyjnej kasety 11- lub 12-rzedowej.
+   - Obrotowy pierscien indeksujacy sluzacy do regulacji optymalnej linii lancucha
+     bez koniecznosci regulacji srub przerzutki w rowerze.
+2. Kontrolery Zwift Play (dol zdjecia):
+   - Lewy kontroler (montowany pod lewa klamkomanetka paskiem gumowym):
+     * 4-kierunkowy D-Pad (strzalki gora, dol, lewo, prawo),
+     * Dolna manetka oznaczona symbolem Minus ("-") do zrzucania biegu na lzejszy.
+   - Prawy kontroler (montowany pod prawa klamkomanetka):
+     * 4 przyciski akcji w ukladzie diamentowym (Y, A, B, Z),
+     * Dolna manetka oznaczona symbolem Plus ("+") do wrzucania twardszego biegu.
+
+Ustalenie logiki uzytkowej:
+Gdy manetki sa sparowane -> OskiRide wlacza wirtualne przelozenia 1..24 na zębatce Cog.
+Gdy manetki nie sa sparowane -> OskiRide dziala w trybie klasycznej kasety.
+
+
+================================================================================
+4. KROK 3: ANALIZA I INZYNIERIA WSTECZNA PROTOKOLU BLE ZWIFT
+================================================================================
+Dzialanie:
+Przeprowadzono analize specyfikacji pakietow Bluetooth Low Energy wykorzystywanych
+przez osprzet Zwift Play i Zwift Click na podstawie badan spolecznosci open-source
+(OpenBikeControl, SwiftControl, QZ, ajchellew, Makinolo).
+
+Parametry profilu GATT Zwift:
+- Primary Service UUID:
+  00000001-19ca-4651-86e5-fa29dcdd09d1
+- Characteristic Async/Measurement (NOTIFY):
+  00000002-19ca-4651-86e5-fa29dcdd09d1
+  (odbior zdarzen wcisniecia i puszczenia przyciskow oraz telemetrii)
+- Characteristic Control Point (WRITE / WRITE_NO_RESPONSE):
+  00000003-19ca-4651-86e5-fa29dcdd09d1
+  (wysylanie komend i pakietu aktywacyjnego handshake)
+- Standardowy serwis baterii:
+  Battery Service UUID: 0x180F (charakterystyka Battery Level 0x2A19)
+
+Format pakietu danych (Zwift Play Keypad Message 0x23):
+- Bajt 0: 0x23 (kod operacji komunikatu stanu przyciskow)
+- Bajty 1..4: 32-bitowa liczba calkowita little-endian reprezentujaca bitowa mape
+  stanu przyciskow.
+- Logika: ODWROCONA (Inverted Logic). Bit o wartosci 0 oznacza przycisk wcisniety,
+  bit o wartosci 1 oznacza przycisk zwolniony.
+- Wykrycie nowo wcisnietego przycisku:
+  pressedBits = (~bitmap) & lastBitmap
+- Maski bitowe przetestowane i zmapowane:
+  * 0x0001 : D-Pad Lewo
+  * 0x0002 : D-Pad Gora
+  * 0x0004 : D-Pad Prawo
+  * 0x0008 : D-Pad Dol
+  * 0x0010 : Przycisk A
+  * 0x0020 : Przycisk B
+  * 0x0040 : Przycisk Y
+  * 0x0100 : Przycisk Z
+  * 0x0200 : Lewa manetka Plus (Shift Up)
+  * 0x0400 : Lewa manetka Minus (Shift Down)
+  * 0x2000 : Prawa manetka Plus (Shift Up)
+  * 0x4000 : Prawa manetka Minus (Shift Down)
+
+Format pakietu Zwift Click (prostszy format ramki 1..4 bajty):
+- Zmiana bitu 0 (bajt 0 & 0x01) oznacza przycisk Plus (+),
+- Zmiana bitu 1 (bajt 0 & 0x02) oznacza przycisk Minus (-).
+
+
+================================================================================
+5. KROK 4: IMPLEMENTACJA MODULU ZwiftController (src/ble/zwiftController.js)
+================================================================================
+Dzialanie:
+Stworzono od podstaw modul src/ble/zwiftController.js.
+
+Kluczowe metody i funkcjonalnosci:
+1. ZwiftController.connectController():
+   - Wywoluje navigator.bluetooth.requestDevice z filtrami:
+     filters: [
+       { services: ['00000001-19ca-4651-86e5-fa29dcdd09d1'] },
+       { namePrefix: 'Zwift' }
+     ],
+     optionalServices: ['00000001-19ca-4651-86e5-fa29dcdd09d1', 0x180F, ...]
+   - Nawiazuje polaczenie z serwerem GATT wybranego urzadzenia.
+   - Pobiera glowny serwis Zwift, odnajduje charakterystyke 00000002 i wlacza notyfikacje
+     (startNotifications) z nasluchem zdarzenia 'characteristicvaluechanged'.
+   - Odnajduje charakterystyke sterujaca 00000003 i wysyla inicjalizacyjny ciag
+     znakow ASCII: "RideOn" (new TextEncoder().encode('RideOn')).
+   - Odczytuje stan naladowania baterii z serwisu 0x180F (jesli dostepny) i zapisuje
+     go w state.zwiftBatteryPct.
+   - Dodaje urzadzenie do tablicy this.connectedDevices i ustawia flage:
+     state.zwiftControllerConnected = true.
+   - Umozliwia wielokrotne wywolanie, pozwalajac na jednoczesne sparowanie lewego
+     oraz prawego modulu Zwift Play.
+2. ZwiftController.handleCharacteristicValueChanged(deviceId, event):
+   - Weryfikuje dlugosc i naglowek ramki (0x23 dla Play lub prosty bufor dla Click).
+   - Oblicza nowo wcisniete bity: (~bitmap) & lastBitmap.
+   - Posiada uklad debouncingu (this.lastShiftTime, próg 120 ms), zapobiegajacy
+     przypadkowemu podwojnemu wrzuceniu biegu przy mechanicznym drganiu manetki.
+3. ZwiftController.processPressedMask(pressedBits):
+   - Maska Shift Up (0x2000, 0x0200, 0x02) -> wywoluje callback onGearUp().
+   - Maska Shift Down (0x4000, 0x0400, 0x08) -> wywoluje callback onGearDown().
+   - Przyciski A i B -> wywoluja callback akcji (otwarcie/zamkniecie menu Esc).
+   - Strzalki lewo/prawo -> przelaczanie widoku kamery 3D.
+4. ZwiftController.handleDeviceDisconnected(device):
+   - Obsluguje zdarzenie 'gattserverdisconnected'.
+   - W przypadku odlaczenia wszystkich kontrolerow czysci stan i wznawia tryb kasety.
+
+
+================================================================================
+6. KROK 5: ROZBUDOWA KONTROLERA TRENAZERA (src/ble/trainerController.js)
+================================================================================
+Dzialanie:
+Zmodyfikowano kluczowa metode updateSimulationGrade(rawGradePct, force = false).
+
+Wprowadzona logika:
+1. Sprawdzenie stanu wirtualnych biegow:
+   const isVirtualShifting =
+     state.virtualShiftingMode === 'always' ||
+     (state.virtualShiftingMode !== 'off' && Boolean(state.zwiftControllerConnected));
+2. W trybie klasycznym (brak sparowanych manetek Zwift):
+   effectiveGrade = rawGradePct * (state.trainerDifficultyPct / 100);
+   Trenazer otrzymuje wprost czyste nachylenie terenu z trasy GPX.
+3. W trybie wirtualnym (sparowane manetki Zwift):
+   Opor modyfikowany jest wspolczynnikiem wybranego biegu (1..24).
+   Bieg 12 odpowiada 1:1 nachyleniu terenu.
+   Biegi ponizej 12 redukuja opor pod noga na stromych sciankach.
+   Biegi powyzej 12 zwiekszaja opor na plaskim i zjazdach.
+4. Argument 'force = true':
+   Gdy kolarz naciska przycisk manetki na kierownicy, komenda do trenazera wysylana
+   jest z priorytetem (omijajac standardowy interwal odswiezania 750 ms), dzieki
+   czemu zmiana biegu jest natychmiast wyczuwalna pod pedalem.
+
+
+================================================================================
+7. KROK 6: INTEGRACJA Z INTERFEJSEM I ELECTRONEM
+================================================================================
+Dzialanie:
+Zaktualizowano pliki index.html, style.css, electron-main.js oraz src/main.js.
+
+1. Plik index.html:
+   - Dodano wektorowy symbol SVG manetki do sekcji ikon:
+     <symbol id="icon-controller" viewBox="0 0 24 24">...</symbol>
+   - W pasku urzadzen BLE dodano przycisk:
+     <button id="btn-zwift-connect" class="btn btn-secondary">
+       <svg class="ui-icon"><use href="#icon-controller"/></svg>
+       <span class="button-label" id="zwift-btn-label">Manetki Zwift</span>
+     </button>
+   - W zakladce "Trenazer i trening" dodano select konfiguracji wirtualnych biegow:
+     * Automatycznie (po sparowaniu Zwift) [domyslnie]
+     * Zawsze aktywne (Zwift Cog / klawisze)
+     * Wylaczone (zwykla kaseta w rowerze)
+2. Plik style.css:
+   - Dodano podswietlenie aktywnego polaczenia manetek zgodnie z paleta "Slonce i las":
+     .btn-ble.connected, #btn-zwift-connect.connected {
+       background: var(--or-sage);
+       color: var(--or-paper);
+       border-color: var(--or-sage);
+     }
+3. Plik electron-main.js:
+   - Potwierdzono poprawne dzialanie handlera zdarzenia 'select-bluetooth-device',
+     ktory na podstawie przekazanego filtra BLE automatycznie paruje urzadzenia Zwift.
+4. Plik src/main.js:
+   - Powiazano callbacki zwiftController.onGearUp i onGearDown bezposrednio z funkcja
+     changeVirtualGear(delta).
+   - W updateHUD wprowadzono inteligentny wskaźnik stanu:
+     * Gdy manetki aktywne: "Bieg X/24" (oraz "Bieg X" na dolnym pasku).
+     * Gdy manetki nieaktywne: "Fizyczna kaseta" oraz "Kaseta w rowerze".
+   - Rozszerzono obsluge klawiatury: klawisze "+", "=", "-", "_" oraz strzalki gora/dol
+     podczas aktywnego polaczenia BLE zmieniaja biegi wirtualne.
+   - Dodano obsluge Gamepad API (funkcja checkGamepadShifters wywolywana w petli
+     animate): bumpery L1/R1 oraz D-Pad dowolnego bezprzewodowego gamepada/pilota
+     zmieniaja przelozenia.
+
+
+================================================================================
+8. KROK 7: ZWIEKSZENIE REALIZMU - FAZA 1 (TABELA BIEGOW, RAMPA, ISA, INERCJA)
+================================================================================
+Dzialanie:
+Uzytkownik poprosil o podniesienie realizmu symulacji. Wdrozone zostaly
+zaawansowane ulepszenia fizyczne w src/physics/cyclingPhysics.js i trainerController.js.
+
+1. Dokladna tabela 24 przelozen szosowych (VIRTUAL_GEAR_RATIOS):
+   Zastapiono uproszczony staly offset precyzyjna progresja przelozen odpowiadajaca
+   standardowemu napedowi szosowemu 2x12 (korba kompakt 50/34 z kaseta 11-34T):
+   * Bieg 1 : 1.000 (34x34) - lekki mlynek na podjazdy 15-20%
+   * Bieg 2 : 1.133 (34x30)
+   * Bieg 3 : 1.259 (34x27)
+   * Bieg 4 : 1.417 (34x24)
+   * Bieg 5 : 1.545 (34x22)
+   * Bieg 6 : 1.700 (34x20)
+   * Bieg 7 : 1.889 (34x18)
+   * Bieg 8 : 2.000 (34x17)
+   * Bieg 9 : 2.125 (34x16)
+   * Bieg 10: 2.267 (34x15)
+   * Bieg 11: 2.429 (34x14)
+   * Bieg 12: 2.632 (50x19) - bieg bazowy / neutralny (przelozenie 1:1 z trasa GPX)
+   * Bieg 13: 2.778 (50x18)
+   * Bieg 14: 2.941 (50x17)
+   * Bieg 15: 3.125 (50x16)
+   * Bieg 16: 3.333 (50x15)
+   * Bieg 17: 3.571 (50x14)
+   * Bieg 18: 3.846 (50x13)
+   * Bieg 19: 4.167 (50x12)
+   * Bieg 20: 4.333 (52x12)
+   * Bieg 21: 4.545 (50x11)
+   * Bieg 22: 4.727 (52x11)
+   * Bieg 23: 4.909 (54x11)
+   * Bieg 24: 5.091 (56x11) - sprint i szybki zjazd 65-75 km/h
+
+2. Plynnosc rampy nachylenia trenazera (Grade Smoothing):
+   W trainerController.js wprowadzono filtr dynamiki zmiany nachylenia:
+   - Zmiany terenu z GPX ograniczone sa do maksymalnej dynamiki 1.8% / s.
+   - Zapobiega to gwaltownym uderzeniom oporu w kolana przy szumach wysokosciowych.
+   - Bieg wirtualny przelacza opor natychmiastowo dzieki fladze force.
+
+3. Barometryczna gestosc powietrza wg m n.p.m. (Standard ISA):
+   W stepRiderPhysics wdrozone zostalo rownanie barometryczne:
+   const altitudeM = Math.max(0, rider.currentAltitudeM || 0);
+   const airDensity = 1.225 * Math.exp(-altitudeM / 8500);
+   Na wysokosci 2000 m n.p.m. opor aerodynamiczny maleje o ponad 20%, co pozwala
+   na rozwijanie realistycznych predkosci na alpejskich zjazdach.
+
+4. Bezwladnosc wirujacych kol (Rotational Inertia / Coasting):
+   W rownaniu przyspieszenia uwzgledniono moment bezwladnosci obreczy 700c:
+   const wheelRotationalInertiaMass = 1.8; // kg
+   const effectiveInertialMass = totalMass + wheelRotationalInertiaMass;
+   accel = fNet / effectiveInertialMass;
+   Dzieki temu rower nie staje w miejscu po sekundzie od puszczenia pedalow, lecz
+   posiada naturalny pęd (wybieg).
+
+5. Plynny tunel aerodynamiczny (Drafting Curve):
+   Zastapiono sztywny rabat -25% plynna funkcja odleglosci od poprzedzajacego kolarza:
+   discount = 0.35 * Math.max(0, 1.0 - (gap - 0.8) / 11.2);
+   Pikulka HUD na zywo wyswietla zysk (np. "Tunel aero (opor mniejszy o 31%)").
+
+6. Syntetyczny klik mechaniczny zmiany biegu (Web Audio API):
+   W funkcji changeVirtualGear wywolywany jest krotki (35 ms) dzwiek klikniecia
+   mechanizmu zapadkowego (wyzszy ton dla +, nizszy dla -), co daje wspaniale
+   potwierdzenie wirtualnego przelozenia na cichej zebatce Zwift Cog.
+
+
+================================================================================
+9. KROK 8: ZWIEKSZENIE REALIZMU - FAZA 2 (AKUSTYKA, POCHYLENIE, NP/IF/TSS)
+================================================================================
+Dzialanie:
+Zgodnie z wyborem uzytkownika ("zrob wszystko oprocz 3 a 5 to jeszcze nie")
+wdrozone zostaly punkty 1, 2 oraz 4 (z pominięciem hamulcow i wiatru czolowego).
+
+1. Akustyka pedu - dynamiczny szum wiatru (Aerodynamic Wind Rush):
+   - W src/main.js zaimplementowano funkcje initWindAudio() oraz updateWindSound(speedMps).
+   - Wygenerowano 2-sekundowy bufor szumu rozowego w petli polaczony z filtrem
+     dolnoprzepustowym (BiquadFilter) o zmiennym pasmie i glosnosci.
+   - Poniżej 11 km/h (stromy podjazd): glosnosc wygaszana do 0 (cisza).
+   - W przedziale 11 - 75 km/h: glosnosc i czestotliwosc odciecia filtra (180 - 1130 Hz)
+     rosna wykladniczo wraz z kwadratem predkosci.
+   - Zapewnia to niesamowite, naturalne wrazenie zawrotnej predkosci na zjazdach.
+
+2. Fizyka pochylania roweru w zakretach (Bike Roll & Lean Angle):
+   - W petli renderowania animate wyliczany jest kat pochylenia roweru:
+     const speedRatio = Math.min(1.4, state.speedMps / 10.0);
+     const targetLeanRad = THREE.MathUtils.clamp(
+       THREE.MathUtils.degToRad((state.currentTurnAngleDeg || 0) * 0.45 * speedRatio),
+       -0.42, 0.42
+     );
+     state.currentLeanRad = THREE.MathUtils.lerp(state.currentLeanRad || 0, targetLeanRad, dt * 5.5);
+     playerAvatar.group.rotateZ(-state.currentLeanRad);
+   - Rower i kolarz dynamicznie i plynnie kladą sie w zakret do wnetrza luku
+     (do maksymalnie ok. 24 stopni na ostrych nawrotach).
+   - Taka sama fizyka pochylenia zostala zaimplementowana dla Wirtualnego Rywala
+     (Ghost Rider) oraz wszystkich Pacerow AI na trasie.
+
+3. Zawodowa analityka mocy: Normalized Power (NP), IF i TSS:
+   - Zaimplementowano funkcje computeTrainingMetrics(pointsList, ftp) wedlug
+     dokladnego standardu dra Andrew Coggana:
+     * Obliczenie 30-sekundowej sredniej kroczacej mocy P_30s,
+     * Podniesienie wartosci do 4. potegi, usrednienie i wyciagniecie pierwiastka 4. stopnia (NP),
+     * Obliczenie Intensity Factor: IF = NP / FTP,
+     * Obliczenie Training Stress Score: TSS = (t_sec * NP * IF) / (FTP * 3600) * 100.
+   - Wskazniki te zostaly dodane do:
+     * Dymku podgladu na zywo po najechaniu na pole Sredniej Mocy na HUDzie,
+     * Okna podsumowania treningu (nowa sekcja "Moc znormalizowana i obciazenie":
+       NP X W · IF Y · TSS Z),
+     * Historii przejazdow zapisywanej w pamieci podrecznej (localStorage).
+
+
+================================================================================
+10. KROK 9: PROCEDURA TESTOWA I WERYFIKACJA AUTOMATYCZNA PLAYWRIGHT
+================================================================================
+Dzialanie:
+Przeprowadzono pelny audyt jakosci kodu oraz uruchomiono automatyczne testy UI
+przy uzyciu Playwright i silnika Chromium.
+
+1. Test skladniowy ES Modules:
+   Wszystkie zmodyfikowane pliki (cyclingPhysics.js, trainerController.js,
+   zwiftController.js, main.js) zostaly zweryfikowane w Node.js VM:
+   node --experimental-vm-modules ...
+   Wynik: "All modules pass syntax validation!" (brak bledow skladniowych).
+
+2. Test funkcjonalny w przegladarce (Playwright):
+   Uruchomiono skrypt scratch/test_realism.js laczacy sie z http://localhost:8080:
+   - Weryfikacja obecnosci przycisku Zwift ("Manetki Zwift"): ZALICZONA.
+   - Weryfikacja stanu poczatkowego HUD ("Fizyczna kaseta"): ZALICZONA.
+   - Weryfikacja obecnosci pola finish-np-tss: ZALICZONA.
+   - Weryfikacja dzialania wirtualnej zmiany biegow klawiatura (+ / -): ZALICZONA.
+   - Weryfikacja rozpedzania i symulacji fizyki (10.2 km/h): ZALICZONA.
+   - Odczyt bledow konsoli przegladarki: Console errors: [] (ZERO bledow).
+   - Zapisano zrzut ekranu weryfikacyjnego: output/playwright/realism_upgrade.png.
+
+
+================================================================================
+10. KROK 10: MAKSYMALIZACJA REALIZMU TRAS GPX I GEOMETRII 3D
+================================================================================
+Dzialanie:
+Wdrozenie zaawansowanego rurociagu przetwarzania plikow GPX oraz trojwymiarowej
+geometrii szosy, majacego na celu osiagniecie najwyzszego poziomu realizmu
+topograficznego, inzynieryjnego i biomechanicznego.
+
+Zidentyfikowane ograniczenia surowych plikow GPX i rozwiazania:
+1. Szum barometryczny i kwantyzacja GPS:
+   Zastapiono prymitywna srednia 5-punktowa odleglosciowym filtrem Gaussa
+   o zasiegu +/- 38m (sigma = 16m) bazujacym na rzeczywistym metrycznym dystansie
+   trasy. Usunieto mikroskoki wysokosci bez splaszczania grzbietow i przeleczy.
+2. Nachylenie inzynieryjne szosy (%):
+   Zamiast obliczania spadku miedzy pojedynczymi punktami (co potrafilo dac +40%
+   na pojedynczym skoku GPS), nachylenie wyliczane jest na bazie symetrycznej
+   cieciwy 28m (+/- 14m), z ogranicznikiem skoku nachylenia w pionie
+   (|dGrade/ds| <= 0.22%/m = 2.2% na 10m drogi). Dzieki temu opor trenazera FTMS
+   idealnie odzwierciedla prawdziwa szose.
+3. Rzeczywiste przewyzszenie trasy (+m) z histereza:
+   Wdrozenie algorytmu histerezy progowej (prog ciaglosci 0.6m) eliminuje
+   sztuczne podwajanie sumy podjazdow wynikajace z fluktuacji satelitarnych.
+4. Przechylka poprzeczna szosy na lukach (Superelevation / Banking do 5.5%):
+   Siatka asfaltu oraz trawiasty taras nasypu w src/world/worldBuilder.js
+   pochylaja sie w 3D do wnetrza zakretu zaleznie od promienia luku drogowego.
+   Wysokosc osadzenia kolarza, Ducha i Pacerow uwzglednia nachylenie poprzeczne,
+   gwarantujac, ze opony idealnie dotykaja pochylonego asfaltu.
+5. Fizyczna symulacja predkosci Ducha GPX metoda Newtona-Raphsona:
+   Dla tras z Komoot/Strava bez czasu <time> wprowadzono numeryczne rozwiazywanie
+   rownania oporow ruchu (220W, 83.5kg). Duch wspina sie na 10% z realna
+   predkoscia ~9.7 km/h (zamiast nierealnych 14.4 km/h), a na zjazdach osiaga 65-75 km/h.
+   Dla aktywnosci z Garmina z czasem zaimplementowano kompresje postojow (>10s),
+   dzieki czemu rywal nie zamarza na poboczu podczas wirtualnej jazdy.
+6. Wielosegmentowy profil wysokosciowy ClimbPro (standard UCI / Tour de France):
+   Wypelnienie profilu kolorami stref nachylenia (zielony, blekitny, zolty,
+   pomaranczowy, czerwony powyzej 13%) na HUD oraz w Menu Glownym.
+7. Kompas geograficzny, azymut i roza wiatrow:
+   Wyliczanie azymutu trasy (0-360 st.) i rozy wiatrow (N..NW). Wskaznik kierunku
+   na panelu HUD (np. "16° N") oraz igla Polnocy "N" na minimapie.
+
+Wyniki weryfikacji:
+Test automatyczny test_gpx_ride.js z plikiem przelecz-gorska.gpx:
+- Rozpoznana trasa: Przelecz Gorska (1,3 km, +62 m, 1 podjazd)
+- Przejscie profilu i telemetrii: 9.7 km/h, +4.4%, 16° N
+- Czysta konsola: 0 bledow.
+
+
+================================================================================
+11. KROK 11: REALIZM SCENERII 3D, KOKPITU DI2, STREF TETNA I WYKRESU METY (OPCJE 2, 3, 4)
+================================================================================
+Dzialanie:
+Wdrozenie pakietu zadan zwiekszajacych realizm trasy 3D, czytelnosc przelozen
+i fizjologii oraz analityke podsumowujaca trening po przekroczeniu linii mety.
+
+Zaimplementowane elementy:
+1. Waypointy GPX (<wpt>) i proceduralne bramy szczytowe 3D:
+   - Parser src/gpx/gpxParser.js analizuje tagi <wpt> (nazwa, wysokosc n.p.m.,
+     wspolrzedne geograficzne) i rzutuje je na najblizszy kilometraz trasy.
+   - W module src/world/worldBuilder.js na wysokosci kazdego punktu orientacyjnego
+     generowana jest monumentalna brama drewniano-stalowa z tablica informacyjna
+     (np. "⛰️ PRZELECZ · 1198M"), informujaca kolarza o zdobyciu szczytu lub premii.
+2. Alpejskie kamienie milowe (Milestones):
+   - W module src/world/worldBuilder.js dodano funkcje createMilestonePost.
+   - Wzdluz pobocza co 1000m trasy generowane sa granitowe obeliski z zolta
+     kopulka i numerem kilometra ("KM 1", "KM 2"...), zastepujac wczesniejsze
+     powtarzalne konstrukcje nadjezdniowe.
+3. Alpejskie barierki ochronne (Alpine Guardrails):
+   - W module src/world/worldBuilder.js dodano funkcje createAlpineGuardrails.
+   - Na odcinkach o ekspozycji pionowej powyzje 22m nad dnem doliny oraz w ostrych
+     lukach serpentyn generowane sa drewniano-stalowe barierki ochronne
+     dopasowane wysokosciowo do pochylenia szosy (superelevation), potegujace
+     wrazenie autentycznej jazdy gorskiej i eliminujace poczucie pustki nad przepascia.
+4. Kokpit przelozen Di2 z dokladnym uzebieniem (T):
+   - W src/physics/cyclingPhysics.js zaimplementowano tabele VIRTUAL_GEAR_DETAILS
+     oraz funkcje getGearDetails(gearNum).
+   - Kazdy z 24 biegow wirtualnych jest precyzyjnie odwzorowany w notacji
+     korba x kaseta, np.:
+     * Bieg 1/24  -> 34x34T (najlzejszy mlynek gorski),
+     * Bieg 12/24 -> 50x19T (neutralny blat na plaskim),
+     * Bieg 24/24 -> 56x11T (twardy blat sprintersko-zjazdowy).
+   - HUD i dolny pasek biezaco informuja kolarza o aktualnej konfiguracji napedu.
+5. Fizjologiczne strefy tetna HR Z1-Z5 dla pulsometrow BLE:
+   - W src/physics/cyclingPhysics.js dodano funkcje getHeartRateZoneInfo(bpm, hrMax).
+   - Automatyczny podzial tetna na 5 stref wysilkowych:
+     * Z1 (<60% HRmax): Regeneracja aktywna,
+     * Z2 (60-70% HRmax): Baza tlenowa,
+     * Z3 (70-80% HRmax): Tempo / Aerobik,
+     * Z4 (80-90% HRmax): Prog mleczanowy / Beztlenowy,
+     * Z5 (>90% HRmax): Maksimum beztlenowe VO2max.
+   - Dynamiczna pigulka kolorystyczna na panelu HUD pod wartoscia BPM.
+6. Interaktywna lupa i kursor profilu wysokosciowego (Profile Scrubber):
+   - Na canvasach profilu (HUD oraz Menu Glowne) obsluzono zdarzenia pointermove
+     oraz pointerleave.
+   - Przesuwanie kursora myszy wyswietla pionowa linie oraz elegancki dymek
+     z danymi telemetrycznymi danego punktu: kilometr, wysokosc m n.p.m. oraz
+     nachylenie szosy w procentach.
+7. Wieloliniowy wykres telemetryczny w oknie mety (#finish-telemetry-canvas):
+   - W oknie podsumowania treningu dodano interaktywny wykres canvasowy:
+     * Zielona sylwetka profilu wysokosciowego trasy w tle,
+     * Zolta linia mocy kolarza (W),
+     * Czerwona linia tetna (BPM),
+     * Blekitna linia predkosci (km/h),
+     * Interaktywny kursor scrubbera pokazujacy dokladne wartosci po najechaniu mysza.
+8. Calkowite usuniecie zbednych instrukcji ("Zwolnij przed zakretem", "Dobierz lzejszy bieg", "Wyższy bieg", "Hamuj"):
+   - Zgodnie z wyrazna dyspozycja uzytkownika zlikwidowano wszelkie sztuczne podtytuly
+     nakazujace zwalnianie, hamowanie lub zmiane biegow w src/physics/cyclingPhysics.js
+     oraz index.html.
+   - Karta ostrzegawcza #hazard-banner prezentuje wylacznie czysta, techniczna informacje
+     o geometrii drogi i odleglosci (np. "Zakret w prawo", "Stromy podjazd +10.5%", "Za 80 m"),
+     nie pouczajac kolarza i automatycznie ukrywajac pusty element podtytulu.
+9. Przeksztalcenie "drogi z linijki" w gladkie luki drogowe (smoothRouteHorizontalArcs):
+   - W src/gpx/gpxParser.js zaimplementowano procedure przeksztalcania lamanej GPS
+     w inzynieryjne luki (klotoidy). Zageszcza ona punkty ze stepem 4m i wygladza
+     wspolrzedne poziome (x, z) filtrem Gaussa (sigma = 13m, promien 30m).
+   - Ostre zalamania wierzcholkow GPS zredukowano z 49 stopni do ponizej 6 stopni,
+     zamieniajac kanciaste proste odcinki w plynne, obly luki szosowe.
+   - W src/world/worldBuilder.js dodano 3-punktowe wygladzanie wektora bocznego
+     krawedzi asfaltu (roadEdgeRight), dzieki czemu linie krawedziowe i srodkowe
+     drogi sa idealnie okragle.
+10. Calkowita eliminacja kolizji obiektow 3D z jezdnia (isPositionClearOfRoad):
+   - W module src/world/worldBuilder.js wprowadzono funkcje isPositionClearOfRoad,
+     sprawdzajaca minimalna odleglosc do DOWOLNEGO odcinka szosy na calej trasie
+     (w tym petli serpentyn alpejskich na zboczu).
+   - Wszystkie drzewa, skaly, domki i plotki sa pozycjonowane scisle prostopadlym
+     wektorem rawRight z odsunieciem pnia na 6.3m - 7.7m od osi jezdni (szerokosc
+     pasa ruchu to 3.6m, promien korony 2.4m, co daje stala skrajnie > 0.3m poza
+     asfaltem).
+   - W przypadku braku miejsca w waskich przesmykach gorskich obiekt jest probowany
+     po drugiej stronie lub calkowicie pomijany, wykluczajac wrastanie drzew w droge.
+
+Wyniki weryfikacji Playwright:
+Test automatyczny scratch/test_road_arcs_and_scenery.js zakonczony pelnym sukcesem:
+- Plynne luki drogowe: zweryfikowane w zakretach (max delta < 6 st.) - ZALICZONE
+- Brak drzew i skal na jezdni: zweryfikowano cala trase przelecz-gorska.gpx - ZALICZONE
+- Czysta konsola Chromium: 0 bledow
+- Screenshot potwierdzajacy: output/playwright/smooth_arcs_clean_road.png.
+
+
+================================================================================
+12. KROK 12: PAKIET REALIZMU 1-5 I BEZWARUNKOWY BRAK WIRTUALNYCH HAMULCOW
+================================================================================
+Zgodnie z wyrazna, bezwzgledna dyrektywa uzytkownika:
+"od 1 do 5 . Nigdy nie rob hamulców"
+wdrozono komplet 5 zaawansowanych funkcji realizmu fizycznego, wizualnego i
+akustycznego, calkowicie pomijajac jakiekolwiek mechanizmy hamowania (brak wirtualnych
+hamulcow na kontrolerach, klawiaturze i w silniku fizyki).
+
+1. DYNAMICZNA BIOMECHANIKA KOLARZA (JAZDA NA STOJACO I AERO TUCK):
+   - Moduly: src/physics/cyclingPhysics.js, grafika/kinematyka.js.
+   - Wstawanie z siodelka (out-of-the-saddle climbing):
+     * Wyzwalacz: nachylenie >= 8.0% LUB moc >= 320 W przy kadencji < 74 RPM.
+     * Kinematyka: uniesienie i wysuniecie miednicy, wyprost tulowia oraz pedalo-zalezny
+       boczny kolys roweru (standSway, amplituda do 5.0 stopni).
+   - Pozycja Aero Tuck:
+     * Wyzwalacz: zjazd <= -3.8% przy predkosci > 13.5 m/s (48.6 km/h).
+     * Aerodynamika: spadek powierzchni oporu CdA o 14%, pozwalajacy na plynne
+       osiaganie 65-80 km/h na alpejskich zjazdach.
+     * Kinematyka: obnizona sylwetka, klatka piersiowa opuszczona ku mostkowi kierownicy.
+
+2. CALKOWITE WYLACZENIE SYNTETYCZNYCH DZWIEKOW JAZDY:
+   - Zgodnie z dyspozycja uzytkownika wylaczono wszelkie sztuczne dzwieki jazdy
+     (szum wiatru, szum opon, dzwiek wolnobiegu, dzwonki pasterskie i poglos tunelu).
+   - Kolarz korzysta z naturalnego, autentycznego dzwieku wlasnego roweru, napedu
+     i trenazera na zywca w pokoju bez zbednego halasu z glosnikow laptopa.
+
+3. KLIMAT GORSKICH ETAPOW GRAND TOUR (TOUR DE FRANCE / GIRO D'ITALIA):
+   - Modul: src/world/worldBuilder.js.
+   - Kredowe napisy kibicow na stromych sciankach:
+     * Na sciankach >= 8.5% oraz przed premiami KOM generowane sa napisy
+       ("ALLEZ! ⚡", "HOP! HOP! HOP!", "DAJESZ NA STOJĄCO!", "BRAWO! 🚴", "👑 KOM 👑").
+     * Tekstury z cieniem asfaltu i autentycznymi barwami: kredowa biel, zolc
+       Tour de France (#facc15), roz Giro d'Italia (#f43f5e) i blekit (#38bdf8).
+   - Podwojne szewrony ostrzegawcze na ostrych lukach:
+     * Tablica wczesnego ostrzezenia 28 m przed szczytem luku.
+     * Szewron wejsciowy 6 m przed wierzcholkiem.
+
+4. WEKTOR WIATRU ATMOSFERYCZNEGO I AERODYNAMIKA KIERUNKOWA:
+   - Moduly: src/physics/cyclingPhysics.js, src/main.js, index.html, style.css.
+   - Dynamiczny wektor wiatru (domyslnie 15 km/h z kierunku 220 SW).
+   - Rzeczywista skladowa czolowa v_head = v_wind * cos(delta_theta) oraz pozorna
+     predkosc strug v_app = max(0, v_rider + v_head).
+   - Wspolczynnik bocznego oporu wiatru (yaw factor) wplywajacy na sile oporu F_aero.
+   - Pigulka wiatru na panelu HUD (#hud-wind) ze strzalkami i kolorami:
+     * Zielony (⬇️): wiatr sprzyjajacy w plecy,
+     * Czerwony (⬆️): wiatr czolowy w twarz,
+     * Zolty (↔️): wiatr boczny.
+   - Blekitna strzalka wektora wiatru wyrysowywana na rozy kompasowej minimapy.
+
+5. DETEKCJA PRZESTRZENNA SRODOWISKA 3D (TUNELE BEZ SZTUCZNEGO AUDIO):
+   - Modul: src/main.js.
+   - Detekcja obecnosci w tunelu O(1) na bazie state.tunnelIntervals wykorzystywana
+     do kontroli swiatla i scenerii, bez emitowania syntetycznego poglosu.
+
+6. BEZWARUNKOWY BRAK WIRTUALNYCH HAMULCOW:
+   - Zgodnie z bezwzgledna dyspozycja uzytkownika: zadne hamulce, wirtualne dzwignie
+     ani procedury sztucznego hamowania nie zostaly wdrozone. Rower zwalnia wylacznie
+     pod wplywem realnych oporow toczenia, nachylenia terenu i aerodynamiki.
+
+Wyniki weryfikacji automatycznej Playwright:
+Test scratch/test_realism_1_to_5.js:
+- Wind Badge na HUD: aktywny (⬇️ 15 km/h, wind-tail, skladowa -11.9 km/h) - ZALICZONE
+- Telemetria jazdy: moc 380 W, predkosc 11.8 m/s (42.5 km/h) - ZALICZONE
+- Czysta konsola Chromium: 0 bledow JS
+- Zrzut ekranu weryfikacyjny: output/playwright/realism_features_1_to_5.png.
+
+
+================================================================================
+13. KROK 13: ZAAWANSOWANE USPRAWNIENIA LACZNOSCI RIDER - TRENAZER (FTMS 1-4)
+================================================================================
+Zgodnie z wytycznymi uzytkownika wdrozono komplet 4 inzynieryjnych usprawnien
+komunikacji Bluetooth LE w module src/ble/trainerController.js:
+
+1. AUTO-RECONNECT & KEEP-ALIVE WATCHDOG (AUTOMATYCZNE WZNAWIANIE W TLE):
+   - W przypadku zerwania sesji GATT (np. zaklocenia radiowe Wi-Fi 2.4 GHz lub
+     chwilowy skok napiecia) aplikacja nie wymaga zsiadania z roweru ani klikania myszka.
+   - Automat podejmuje do 6 prob ponownego polaczenia z trenazerem w tle z algorytmem
+     Exponential Backoff (1.5s, 2.5s, 4.0s, 6.5s, 10s, 14s).
+   - Po odzyskaniu polaczenia automatycznie rekonfiguruje powiadomienia i natychmiast
+     synchronizuje aktualne nachylenie trasy do trenazera.
+
+2. BEZSTRATNA KOLEJKA ZAPISU BLE (NON-BLOCKING QUEUED WRITES):
+   - Calkowicie wyeliminowano bledy stosu Bluetooth Windows typu "GATT operation
+     already in progress".
+   - Wprowadzono asynchroniczna kolejke z buforem pendingSimulationBuffer.
+   - Gdy kolejny pakiet nachylenia (lub wirtualnego biegu Zwift Cog) nadejdzie w trakcie
+     trwania poprzedniej transmisji radiowej, zostaje zapamietany i wyslany natychmiast
+     po jej zakonczeniu z 45 ms bezpiecznym odstepem czasowym.
+
+3. INTELIGENTNY BUFOR ANTY-DROPOUTOWY MOCY I KADENCJI (DEADMAN BUFFER):
+   - Chwilowe zaniki pojedynczych pakietow radiowych z trenazera (drop na 0 W przy
+     kreceniu korba) sa maskowane 1.3-sekundowym filtrem bezwladnosci, podtrzymujac
+     poprzednia moc z plynna obwiednia wygaszania (96%).
+   - Dopiero gdy kolarz rzeczywiscie przestanie pedalowac (kadencja = 0 przez > 1.2 s)
+     lub minie > 2.0 s bez zadnych pakietow, moc zostaje plynnie wyzerowana do 0 W.
+
+4. PELNA FIZYCZNA RAMKA FTMS OP-CODE 0x11:
+   - Zastapiono sztywne zera pelna specyfikacja Bluetooth SIG FTMS:
+     * Bajt 1-2: Wind Speed (jednostka 0.001 m/s) - rzeczywista skladowa wiatru,
+     * Bajt 3-4: Grade (jednostka 0.01%) - nachylenie z uwzglednieniem wirtualnych biegow,
+     * Bajt 5: Crr (jednostka 0.0001) - opor toczenia opon,
+     * Bajt 6: Cw (jednostka 0.01 kg/m) - aerodynamiczny opor wiatru CdA * rho(h)
+       zalezny od barometrycznej wysokosci n.p.m. wg ISA.
+   - Umozliwia sprzetowa emulacje kola zamachowego w mikrokontrolerach trenazerow Smart
+     (Wahoo KICKR, Tacx Neo, Elite Direto XR, Magene).
+
+Wyniki weryfikacji automatycznej Playwright:
+Test scratch/test_trainer_improvements.js:
+- Anti-Dropout Buffer (moc 260 W -> drop podtrzymany na 250 W -> stop 0 W): ZALICZONE
+- Pelna ramka FTMS OpCode 0x11 (OpCode 17, Wind 2.5 m/s, Crr 0.0038, Cw 0.33): ZALICZONE
+- Auto-reconnect scheduling: ZALICZONE
+- Czysta konsola Chromium: 0 bledow JS.
+
+
+================================================================================
+14. KROK 14: PLIKI DOKUMENTACJI W REPOZYTORIUM
+================================================================================
+W celu zapewnienia trwalosci i czytelnosci stworzono nastepujace pliki:
+1. CHANGELOG.md (w katalogu glownym):
+   Pelna, ustrukturyzowana historia wersji zgodna ze standardem Keep a Changelog.
+2. docs/DOKUMENTACJA_TECHNICZNA.md:
+   Wyczerpujaca specyfikacja architektoniczna, profile GATT Bluetooth, wzory
+   fizyczne oraz definicje algorytmow matematycznych.
+3. README.md:
+   Zaktualizowano spis modulow o zwiftController.js, CHANGELOG.md oraz
+   DOKUMENTACJA_TECHNICZNA.md.
+4. DOKUMENTACJA_WDROZENIA.txt (niniejszy plik):
+   Chronologiczny opis wykonanych dzialan krok po kroku.
+
+
+================================================================================
+15. PODSUMOWANIE I INSTRUKCJA UZYTKOWANIA DLA KOLARZA
+================================================================================
+Jak korzystac z wdrozonego rozwiazania:
+1. Uruchomienie:
+   Wlacz OskiRide (desktopowo przez npm run desktop lub w przegladarce Chrome/Edge
+   pod adresem http://localhost:8080).
+2. Parowanie osprzetu:
+   - Kliknij "Polacz trenazer" -> wybierz swoj trenazer Smart FTMS.
+   - Kliknij "Manetki Zwift" -> wcisnij dowolny przycisk na manetkach Zwift Play
+     lub Click, aby dioda zaczela pulsowac na niebiesko, a nastepnie wybierz je
+     z listy Bluetooth.
+   - Przycisk zaswieci sie na zielono, pokazujac stan baterii manetki.
+3. Jazda i sterowanie:
+   - Po sparowaniu HUD wyswietli "Bieg 12/24 · 50×19T".
+   - Prawa dolna manetka (+) wrzuca twardszy bieg na plaskim i zjazdach.
+   - Lewa dolna manetka (-) zrzuca na lzejszy bieg pod gore.
+   - Przyciski A i B otwieraja menu ustawien (odpowiednik klawisza Esc).
+   - Strzalki zmieniaja widok kamery 3D.
+   - Kazda zmiana biegu potwierdzana jest dyskretnym klikiem mechanicznym.
+   - Na zjazdach wiatr w uszach szumi proporcjonalnie do predkosci.
+   - W zakretach rower dynamicznie pochyla sie do wnetrza luku.
+   - Wzdluz trasy mijasz kamienne slupki kilometrowe (KM 1, KM 2...), barierki
+     ochronne nad urwiskami oraz bramy waypointow ze szczytami GPX.
+   - Na mecie podsumowanie wyswietli profesjonalna metryke NP, IF, TSS oraz
+     wieloliniowy wykres telemetryczny mocy, tetna i predkosci.
+================================================================================
+16. KROK 16: PAKIET 5 ZAAWANSOWANYCH FUNKCJI TRENINGOWYCH I 3D (1 DO 5)
+================================================================================
+Zgodnie z wytycznymi uzytkownika wdrozono pelen zestaw 5 funkcji rozwoju platformy:
+
+1. TRYB TRENINGOW USTRUKTURYZOWANYCH (.ZWO / .MRC / ERG MODE):
+   - Modul: src/workouts/workoutEngine.js.
+   - Parsowanie plikow XML .ZWO (standard Zwift / TrainingPeaks) oraz plikow .MRC / .ERG.
+   - Wbudowana biblioteka 5 treningow: Sweet Spot 2x15, VO2 Max 5x3, Tabata HIIT,
+     Over-Unders 3x9 oraz Baza Z2.
+   - Zakladka "Treningi" w menu glownym (#btn-tab-workouts, #menu-workouts-section)
+     oraz widget HUD treningu (#workout-banner) z czasem bloku, zadana moca,
+     kadencja i paskiem w barwie strefy Coggana (Z1-Z6).
+   - Automatyczne wysylanie zadanej mocy w watach do trenazera Smart w trybie ERG
+     (FTMS OpCode 0x05 / Tacx Page 49 / Wahoo OpCode 0x42).
+
+2. WIELOURZADZENIOWA MATRYCA PAROWANIA BLE (MULTI-DEVICE BLE MATRIX):
+   - Odseparowane kafelki lacznosci w menu:
+     * Trenazer FTMS (0x1826 FTMS / Tacx / Wahoo controllable),
+     * Moc BLE (0x1818 Cycling Power Service),
+     * Kadencja BLE (0x1816 Cycling Speed & Cadence),
+     * Pulsometr (0x180D Heart Rate Monitor),
+     * Manetki Zwift (Zwift Play / Click).
+
+3. ZAAWANSOWANE AI PACEROW I STRUGA TUNELU AERO 3D (DRAFTING STREAM RIBBON):
+   - Dynamiczna taktyka botow: Pacer A (Goral) atakuje na wzniesieniach (>1.5% do +35% mocy),
+     Pacer C (Lider grupy) stabilizuje tempo gdy gracz siedzi na kole i czeka (-10%) gdy lekko odstaje.
+   - Trojwymiarowa wstega Three.js (draftingRibbonMesh) laczaca tylne kolo pacera
+     z przednim kolem gracza w strefie tunelu aerodynamicznego (0.8 m < gap < 12.0 m).
+
+4. DYNAMICZNA PORA DNIA I SZOSOWA LAMPKA ROWEROWA LED 3D:
+   - Tryb "dynamic" w selektorze pory dnia plynnie interpolujacy swiatlo poludnia,
+     zlota godzine i zmierzch w funkcji postepu trasy.
+   - Realistyczny reflektor Three.js SpotLight na kierownicy (42 m zasiegu),
+     aktywowany automatycznie w tunelach oraz o zmierzchu/w nocy.
+
+5. LIVE KOM & PR CHALLENGER NA PODJAZDACH CLIMBPRO:
+   - Wskaznik rywalizacji w czasie rzeczywistym (#climbpro-challenger) na kafelku ClimbPro.
+   - Prezentacja delty dystansowej i czasowej do rekordu/Ducha (+42 m / -4.2 s zielony ahead
+     lub czerwony behind) oraz pozostalego przewyzszenia do szczytu.
+
+Scisle ograniczenia negatywne (100% zachowane):
+- ZERO wirtualnych hamulcow.
+- ZERO protekcjonalnych komunikatow (zadnego "zwolnij", "hamuj", "wyzszy bieg", "lzejszy bieg").
+- Proceduralne audio syntetyczne wylaczone.
+
+Wyniki weryfikacji automatycznej Playwright:
+Test scratch/test_features_1_to_5.js i scratch/test_deep_verification.js:
+- Parsery .ZWO i .MRC: ZALICZONE
+- HUD treningu ustrukturyzowanego i sterowanie ERG: ZALICZONE
+- Przyciski BLE Matrix: ZALICZONE
+- Struga tunelu aero 3D i dynamiczne AI pacerow: ZALICZONE
+- Dynamiczna pora dnia i reflektor LED SpotLight: ZALICZONE
+- Live KOM & PR Challenger: ZALICZONE
+- Czysta konsola Chromium: 0 bledow JS.
+================================================================================
+                            KONIEC DOKUMENTACJI
+================================================================================

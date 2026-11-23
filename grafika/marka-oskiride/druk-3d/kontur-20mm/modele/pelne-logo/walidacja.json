@@ -1,0 +1,35 @@
+{
+  "triangles": 6584,
+  "vertices": 3276,
+  "watertight": true,
+  "consistent_winding": true,
+  "positive_volume": true,
+  "volume_mm3": 56191.698,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "connected_components": 1,
+  "bounds_mm": [
+    [
+      -80.0,
+      -10.0,
+      0.0
+    ],
+    [
+      80.0,
+      10.0,
+      32.97365
+    ]
+  ],
+  "size_mm": [
+    160.0,
+    20.0,
+    32.97365
+  ],
+  "reference": "freestanding contour on a low plinth",
+  "depth_mm": 20,
+  "plinth_height_mm": 4,
+  "backing_plate": false,
+  "rear_dot_bridges": 2,
+  "open_fraction_of_bounding_box": 0.4675,
+  "physical_print_tested": false
+}

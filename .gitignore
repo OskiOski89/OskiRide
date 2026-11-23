@@ -1,0 +1,26 @@
+node_modules/
+dist/
+tools/3d/toolchain.local.json
+tools/3d/*.log
+tools/3d/.cache/
+__pycache__/
+.playwright-cli/
+*.blend1
+output/playwright/
+scratch/
+/output/
+
+# Prywatne materiały oraz wygenerowane pliki do pobrania z GitHub Releases.
+*.exe
+*.msi
+*.exe.blockmap
+*.pfx
+*.p12
+.env
+.env.*
+**/kibice/13-portret*
+**/kibice/13-twarz*
+**/kibice/kibice.blend
+**/kibice/kibice-grupa.glb
+**/kibice/podglad.png
+**/kibice/w-grze.png

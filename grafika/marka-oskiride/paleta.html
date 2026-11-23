@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#234C3B" />
+  <link rel="icon" type="image/png" href="oskiride-icon.png?v=2" />
+  <title>OskiRide — Słońce i las</title>
+  <link rel="stylesheet" href="theme.css?v=2" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--or-cream); color: var(--or-ink); font-family: 'Segoe UI', sans-serif; }
+    body { padding: 38px max(24px, calc((100vw - 1180px) / 2)); }
+    a { color: var(--or-forest); text-underline-offset: 4px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--or-border); padding-bottom: 22px; }
+    .logo { width: 240px; height: 60px; }
+    .edition { color: var(--or-muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+    .hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: end; margin: 42px 0 32px; }
+    .eyebrow { color: var(--or-forest); font-weight: 750; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 14px; }
+    h1 { font-size: clamp(36px, 4.5vw, 60px); line-height: 1.08; letter-spacing: -2.3px; margin: 0; font-weight: 750; }
+    h1 span { color: var(--or-forest); }
+    .intro { color: var(--or-muted); line-height: 1.7; font-size: 16px; margin: 0 0 3px; max-width: 390px; }
+    .palette { display: grid; grid-template-columns: repeat(6, 1fr); overflow: hidden; border: 1px solid var(--or-border); border-radius: 18px; }
+    .swatch { padding: 20px 17px; min-height: 122px; display: flex; flex-direction: column; justify-content: space-between; }
+    .swatch b { font-size: 14px; }
+    .swatch small { font-size: 12px; font-family: monospace; }
+    .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin: 36px 0 14px; }
+    h2 { font-size: 21px; letter-spacing: -.5px; margin: 0; }
+    .section-title p { color: var(--or-muted); font-size: 13px; margin: 0; }
+    .examples { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+    .sample { border-radius: 20px; border: 1px solid var(--or-border); padding: 24px; background: var(--or-paper); }
+    .sample h3 { margin: 0 0 5px; font-size: 22px; letter-spacing: -.5px; }
+    .sample p { margin: 0; color: var(--or-muted); line-height: 1.5; font-size: 14px; }
+    .sample-label { display: block; margin-bottom: 20px; color: var(--or-muted); font-size: 10px; font-weight: 750; letter-spacing: 1.8px; }
+    .route { padding: 17px; margin: 20px 0 15px; border: 2px solid var(--or-forest); background: #EDF2E5; border-radius: 12px; }
+    .route-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .route-top b { font-size: 15px; }
+    .tag { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--or-sage); background: var(--or-sage-soft); }
+    .route p { font-size: 12px; }
+    .route-profile { width: 100%; height: 42px; margin-top: 10px; display: block; }
+    button { font: inherit; cursor: pointer; border-radius: 10px; font-size: 13px; font-weight: 750; padding: 12px 18px; border: 1px solid transparent; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .start { background: var(--or-yellow); color: var(--or-ink); flex: 1; }
+    .upload { background: var(--or-forest); color: var(--or-paper); }
+    .start:hover { background: #F8D96E; }
+    .upload:hover { background: var(--or-forest-hover); }
+    .connected { display: flex; align-items: center; gap: 7px; color: var(--or-sage); font-size: 12px; margin-top: 15px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .ride { background: var(--or-deep-green); border-color: var(--or-deep-green); color: var(--or-cream); }
+    .ride .sample-label, .ride p { color: var(--or-dark-muted); }
+    .ride-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .ride .logo { background: var(--or-cream); border-radius: 8px; width: 150px; height: 38px; }
+    .live { color: #BACFA6; font-size: 11px; display: flex; gap: 7px; align-items: center; }
+    .power { border-radius: 13px; background: var(--or-deep-green-raised); border: 1px solid #526B53; padding: 18px; margin: 18px 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .watts { font-size: 54px; font-weight: 750; line-height: 1; letter-spacing: -2px; }
+    .watts small { color: var(--or-yellow); font-size: 20px; letter-spacing: 0; }
+    .zone { text-align: right; font-size: 14px; line-height: 1.6; }
+    .zone small { color: #BACFA6; font-size: 11px; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat { background: var(--or-deep-green-raised); border-radius: 9px; padding: 12px; }
+    .stat small { color: var(--or-dark-muted); font-size: 9px; letter-spacing: .9px; display: block; margin-bottom: 5px; }
+    .stat b { font-size: 24px; font-weight: 700; }
+    .stat em { font-size: 11px; font-style: normal; color: var(--or-dark-muted); }
+    .ride-note { margin-top: 18px !important; font-size: 12px !important; }
+    .status-message { min-height: 20px; margin-top: 12px !important; font-size: 12px !important; color: var(--or-sage) !important; }
+    footer { margin: 27px 0 10px; padding-top: 20px; border-top: 1px solid var(--or-border); color: var(--or-muted); font-size: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; line-height: 1.6; }
+    @media (max-width: 760px) { body { padding: 24px 18px; } .hero, .examples { grid-template-columns: 1fr; gap: 20px; } .palette { grid-template-columns: repeat(3, 1fr); } .swatch { min-height: 105px; } .hero { margin: 30px 0; } .edition { display: none; } .section-title { align-items: flex-start; flex-direction: column; gap: 5px; } .sample { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand-logo-frame logo"><img src="oskiride-logo.png?v=2" alt="OskiRide" /></div>
+    <span class="edition">Kierunek kolorystyczny / 03</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div><p class="eyebrow">Słońce i las</p><h1>Dobra energia.<br /><span>Wspólna jazda.</span></h1></div>
+      <p class="intro">Ciepła, przyjazna paleta dla Twojego rowerowego kompana. Jasne menu przed treningiem. Spokojne, ciemnozielone liczniki, kiedy ruszasz w trasę.</p>
+    </section>
+    <section class="palette" aria-label="Główne kolory aplikacji">
+      <div class="swatch" style="background:var(--or-yellow)"><b>Słońce</b><small>#F2C94C · energia</small></div>
+      <div class="swatch" style="background:var(--or-forest);color:var(--or-paper)"><b>Leśna zieleń</b><small>#234C3B · działanie</small></div>
+      <div class="swatch" style="background:var(--or-cream)"><b>Krem</b><small>#FBF5EA · tło</small></div>
+      <div class="swatch" style="background:var(--or-sand)"><b>Jasna oliwka</b><small>#ECEEDC · panele</small></div>
+      <div class="swatch" style="background:var(--or-deep-green);color:var(--or-cream)"><b>Leśny cień</b><small>#172B23 · HUD</small></div>
+      <div class="swatch" style="background:var(--or-sage);color:var(--or-paper)"><b>Szałwia</b><small>#557347 · gotowość</small></div>
+    </section>
+    <div class="section-title"><h2>Tak mogą wyglądać Twoje treningi</h2><p>Przykładowe dane pokazują zastosowanie kolorów.</p></div>
+    <section class="examples" aria-label="Przykłady interfejsu">
+      <article class="sample">
+        <span class="sample-label">01 / MENU PRZED JAZDĄ</span>
+        <h3>Dokąd dziś jedziemy?</h3><p>Wybierz trasę. Resztę zrobimy razem.</p>
+        <div class="route"><div class="route-top"><b>Przełęcz Alpejska</b><span class="tag">Wybrana</span></div><p>5,2 km &nbsp; · &nbsp; Podjazd KOM &nbsp; · &nbsp; Śr. 6,5%</p>
+          <svg class="route-profile" viewBox="0 0 420 42" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 L0 35 L35 33 L78 23 L112 28 L159 12 L205 20 L248 3 L286 10 L332 27 L372 22 L420 36 L420 42 L0 42Z" fill="#F2C94C" fill-opacity=".35"/><path d="M0 35 L35 33 L78 23 L112 28 L159 12 L205 20 L248 3 L286 10 L332 27 L372 22 L420 36" fill="none" stroke="#234C3B" stroke-width="2.5"/></svg>
+        </div>
+        <div class="actions"><button class="start" type="button" id="preview-start">Ruszajmy →</button><button class="upload" type="button" id="preview-upload">Wgraj GPX</button></div>
+        <div class="connected"><span class="dot"></span>Przykład statusu: trenażer połączony</div>
+        <p class="status-message" id="preview-message" role="status" aria-live="polite"></p>
+      </article>
+      <article class="sample ride">
+        <span class="sample-label">02 / LICZNIKI PODCZAS JAZDY</span>
+        <div class="ride-top"><div class="brand-logo-frame logo"><img src="oskiride-logo.png?v=2" alt="OskiRide" /></div><span class="live"><span class="dot"></span>Przykładowy trening</span></div>
+        <div class="power"><div class="watts">182 <small>W</small></div><div class="zone">2,43 W/kg<br /><small>Z2 · WYTRZYMAŁOŚĆ</small></div></div>
+        <div class="stats"><div class="stat"><small>PRĘDKOŚĆ</small><b>28,4</b> <em>km/h</em></div><div class="stat"><small>KADENCJA</small><b style="color:var(--or-yellow)">86</b> <em>rpm</em></div><div class="stat"><small>TĘTNO</small><b style="color:#F3A09B">142</b> <em>bpm</em></div></div>
+        <p class="ride-note">Kremowe cyfry, słoneczne akcenty i ciemnozielone tło. Kolory stref wysiłku zachowują znaczenie treningowe.</p>
+      </article>
+    </section>
+  </main>
+  <footer><span>OskiRide · Twój kompan na każdą trasę.</span><span><a href="../../index.html">Otwórz aplikację</a> &nbsp; / &nbsp; <a href="oskiride-logo.png?v=2" download>Pobierz logo</a> &nbsp; / &nbsp; <a href="README.md">Opis palety</a></span></footer>
+  <script>
+    document.getElementById('preview-start').addEventListener('click', () => {
+      window.location.href = '../../index.html';
+    });
+    document.getElementById('preview-upload').addEventListener('click', () => {
+      document.getElementById('preview-message').textContent = 'Własny plik GPX wgrasz w aplikacji. Użyj przycisku „Ruszajmy”.';
+    });
+  </script>
+</body>
+</html>

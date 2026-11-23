@@ -1,0 +1,136 @@
+{
+  "units": "mm",
+  "orientation": "upright",
+  "width_mm": 160.0,
+  "base_height_mm": 18.4,
+  "relief_height_mm": 1.6,
+  "total_depth_mm": 20.0,
+  "parts": {
+    "oskiride-podstawa.stl": {
+      "triangles": 396,
+      "vertices": 200,
+      "watertight": true,
+      "consistent_winding": true,
+      "positive_volume": true,
+      "volume_mm3": 105764.04,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "connected_components": 1,
+      "bounds_mm": [
+        [
+          -80.0,
+          -8.4,
+          0.0
+        ],
+        [
+          80.0,
+          10.0,
+          35.9737
+        ]
+      ],
+      "size_mm": [
+        160.0,
+        18.4,
+        35.9737
+      ],
+      "name": "Podstawa — krem",
+      "reference_colour": "#FBF5EA"
+    },
+    "oskiride-znak-OR.stl": {
+      "triangles": 1768,
+      "vertices": 882,
+      "watertight": true,
+      "consistent_winding": true,
+      "positive_volume": true,
+      "volume_mm3": 1330.574,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "connected_components": 1,
+      "bounds_mm": [
+        [
+          -77.0,
+          -10.0,
+          3.8101
+        ],
+        [
+          -33.57864,
+          -8.4,
+          32.9737
+        ]
+      ],
+      "size_mm": [
+        43.42136,
+        1.6,
+        29.1636
+      ],
+      "name": "Znak OR — żółty",
+      "reference_colour": "#F2C94C"
+    },
+    "oskiride-napis.stl": {
+      "triangles": 5332,
+      "vertices": 2678,
+      "watertight": true,
+      "consistent_winding": true,
+      "positive_volume": true,
+      "volume_mm3": 2203.865,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "connected_components": 10,
+      "bounds_mm": [
+        [
+          -32.20147,
+          -10.0,
+          3.0
+        ],
+        [
+          77.0,
+          -8.4,
+          24.14361
+        ]
+      ],
+      "size_mm": [
+        109.20147,
+        1.6,
+        21.14361
+      ],
+      "name": "Napis — leśna zieleń",
+      "reference_colour": "#234C3B"
+    }
+  },
+  "combined": {
+    "triangles": 7518,
+    "vertices": 3761,
+    "watertight": true,
+    "consistent_winding": true,
+    "positive_volume": true,
+    "volume_mm3": 109298.479,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "bounds_mm": [
+      [
+        -80.0,
+        -10.0,
+        0.0
+      ],
+      [
+        80.0,
+        10.0,
+        35.9737
+      ]
+    ],
+    "size_mm": [
+      160.0,
+      20.0,
+      35.9737
+    ]
+  },
+  "packages": {
+    "opencv-python-headless": "5.0.0.93",
+    "shapely": "2.2.0",
+    "trimesh": "5.2.0",
+    "mapbox-earcut": "2.1.0",
+    "manifold3d": "3.5.4",
+    "numpy": "2.5.4"
+  }
+}

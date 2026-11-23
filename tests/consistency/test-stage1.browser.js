@@ -1,0 +1,107 @@
+async (page) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/src/ble/trainerController.js', async route => {
+    const response = await route.fetch();
+    const code = (await response.text()).replace('this.state = state;', 'this.state = state; if (state === window.state) window.__appTrainer = this;');
+    await route.fulfill({ response, body: code });
+  });
+  await page.goto('http://localhost:8080/index.html');
+  await page.waitForLoadState('networkidle');
+  const results = await page.evaluate(async () => {
+    const {parseMrcWorkout, getWorkoutStateAtTime} = await import('/src/workouts/workoutEngine.js');
+    const {TrainerController} = await import('/src/ble/trainerController.js');
+    const checks = [];
+    const check = (name, value) => { if (!value) throw new Error(name); checks.push(name); };
+    const text = unit => `[COURSE HEADER]\nMINUTES ${unit}\n[COURSE DATA]\n0 200\n1 200\n[END COURSE DATA]`;
+    const erg = parseMrcWorkout(text('WATTS'));
+    check('ERG 200 W stays 200 W at FTP 250 and 350', [250,350].every(ftp=>getWorkoutStateAtTime(erg,10,ftp).targetWatts===200));
+    const mrc = parseMrcWorkout(text('PERCENT'));
+    check('MRC 200% scales with FTP', getWorkoutStateAtTime(mrc,10,250).targetWatts===500 && getWorkoutStateAtTime(mrc,10,350).targetWatts===700);
+    const ramp = parseMrcWorkout(text('WATTS').replace('1 200','1 300'));
+    check('ERG ramp uses watts', getWorkoutStateAtTime(ramp,30,350).targetWatts===250);
+    check('ERG extension without unit header', getWorkoutStateAtTime(parseMrcWorkout(text('WATTS').replace('MINUTES WATTS',''),'erg'),0,350).targetWatts===200);
+    check('Header overrides extension', getWorkoutStateAtTime(parseMrcWorkout(text('PERCENT'),'erg'),0,250).targetWatts===500);
+    for (const bad of ['',text('WATTS').replace('1 200','1 NaN'),text('WATTS').replace('1 200','-1 200')]) {
+      let rejected=false; try { parseMrcWorkout(bad); } catch { rejected=true; } check('Reject malformed course '+checks.length,rejected);
+    }
+    const state = {bleConnected:true,hasRideStarted:true,trainerMode:'sim',trainerDifficultyPct:100,currentGradePct:4,virtualShiftingMode:'off',ergSoftStartSec:0};
+    const controller = new TrainerController(state);
+    const writes=[];
+    controller.ftmsControlPointChar={writeValue:async buffer=>writes.push([...new Uint8Array(buffer)])};
+    await controller.updateSimulationGrade(4,true);
+    check('SIM sends grade opcode',writes.at(-1)[0]===0x11);
+    controller.setTrainerMode('erg');
+    await controller.setTargetPowerWatts(200,true);
+    const ergCount=writes.length;
+    await controller.updateSimulationGrade(8,true);
+    check('ERG blocks grade even with force',writes.length===ergCount && writes.at(-1)[0]===0x05);
+    state.ergSoftStartSec=1;
+    await controller.setTargetPowerWatts(300);
+    controller.setTrainerMode('sim');
+    const switched=writes.length;
+    await new Promise(resolve=>setTimeout(resolve,200));
+    check('Switch to SIM cancels ERG ramp',controller.ergRampIntervalId===null && writes.length===switched);
+    await controller.setTargetPowerWatts(250,true);
+    check('SIM blocks target power',writes.length===switched);
+    state.hasRideStarted=false;
+    await controller.updateSimulationGrade(5,true);
+    check('No control before start',writes.length===switched);
+    state.hasRideStarted=true;
+    let release;
+    const ordered=[];
+    controller.ftmsControlPointChar={writeValue:async buffer=>{ ordered.push([...new Uint8Array(buffer)]); if(ordered.length===1) await new Promise(resolve=>release=resolve); }};
+    controller.updateSimulationGrade(3,true);
+    controller.updateSimulationGrade(7,true);
+    controller.setTrainerMode('erg');
+    controller.setTargetPowerWatts(210,true);
+    release();
+    await new Promise(resolve=>setTimeout(resolve,100));
+    check('Mode switch discards queued old SIM command', ordered.length===2 && ordered[0][0]===0x11 && ordered[1][0]===0x05);
+    controller.cancelPendingControl();
+    return checks;
+  });
+  const check = (name, value) => { if (!value) throw new Error(name); results.push(name); };
+  await page.waitForTimeout(700);
+  check('Fresh menu has zero time, distance and energy', await page.evaluate(()=>window.state.elapsedSeconds===0 && window.state.distanceM===0 && window.state.energyJoules===0));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  check('Escape before start does not start session', await page.evaluate(()=>!window.state.hasRideStarted && window.state.elapsedSeconds===0));
+  await page.locator('#btn-top-menu').click();
+  await page.locator('#btn-settings-close').click();
+  await page.waitForTimeout(250);
+  check('Without input, simulation stays at zero watts and does not move', await page.evaluate(()=>state.watts===0 && state.distanceM===0 && state.elapsedSeconds===0));
+  await page.locator('#sim-watts').fill('180');
+  await page.waitForTimeout(1200);
+  check('Explicit start advances ride',await page.evaluate(()=>window.state.hasRideStarted && window.state.elapsedSeconds>0 && window.state.distanceM>0));
+  await page.evaluate(()=>{
+    window.__controlWrites=[];
+    window.__appTrainer.ftmsControlPointChar={writeValue:async b=>window.__controlWrites.push([...new Uint8Array(b)])};
+    window.state.bleConnected=true;
+    window.state.ergSoftStartSec=0;
+  });
+  await page.locator('#btn-top-menu').click();
+  await page.locator('#btn-tab-workouts').click();
+  await page.locator('#btn-workout-toggle').click();
+  await page.waitForTimeout(250);
+  check('Workout updates title and step 1/5',await page.locator('#workout-step-num').textContent()==='1/5' && (await page.locator('#workout-step-title').textContent()).includes('warm-up'));
+  check('Workout chooses ERG',await page.evaluate(()=>window.__appTrainer.trainerMode==='erg' && window.__controlWrites.some(b=>b[0]===0x05)));
+  await page.evaluate(()=>{
+    window.state.activeWorkout={name:'Przejścia',totalDurationSec:30,blocks:[{type:'steadystate',durationSec:10,powerPct:.8,name:'ERG A'},{type:'freeride',durationSec:10,name:'Swobodnie'},{type:'steadystate',durationSec:10,powerPct:.9,name:'ERG B'}]};
+    window.state.workoutElapsedSec=11;
+    window.__controlWrites=[];
+  });
+  await page.waitForTimeout(200);
+  check('FreeRide returns to SIM with no ERG writes',await page.evaluate(()=>window.__appTrainer.trainerMode==='sim' && window.__controlWrites.some(b=>b[0]===0x11) && !window.__controlWrites.some(b=>b[0]===0x05)));
+  await page.evaluate(()=>{window.state.workoutElapsedSec=21;window.__controlWrites=[];});
+  await page.waitForTimeout(200);
+  check('Next block restores ERG',await page.evaluate(()=>window.__appTrainer.trainerMode==='erg' && window.__controlWrites.some(b=>b[0]===0x05)));
+  await page.evaluate(()=>{window.state.workoutElapsedSec=31;});
+  await page.waitForTimeout(200);
+  check('Completion stops workout and restores selected mode',await page.evaluate(()=>!window.state.isWorkoutRunning && window.__appTrainer.trainerMode===window.state.trainerMode));
+  await page.evaluate(()=>{window.state.bleConnected=false;window.__appTrainer.cancelPendingControl();});
+  check('No browser exceptions',errors.length===0);
+  await page.unroute('**/src/ble/trainerController.js');
+  return {passed:results.length,checks:results,errors};
+}
+

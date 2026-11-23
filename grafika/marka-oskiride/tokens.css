@@ -1,0 +1,124 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: brand · redesign: full
+ * paper: oklch(97% 0.02 85) · accent: oklch(84% 0.15 88) · display: Segoe UI · body: Segoe UI
+ * nav: kept · signature: live route elevation workbench · states: hover, focus-visible, active, disabled, aria-pressed
+ * axes: light/grotesk-sans/warm · posture: instrument · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P9 H9 E9 S9 R9 V9 · weakest: S, unified spacing onto the 4px grid and lifted all Słońce i las brand colours into tokens */
+:root {
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 144px;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.44rem;
+  --text-2xl: 1.728rem;
+  --text-3xl: 2.074rem;
+  --text-display-s: 1.44rem;
+  --text-display: 1.728rem;
+  --text-section: 1.2rem;
+  --text-title: 1rem;
+  --text-lead: 1rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --color-error: #A83F45;
+  --color-success: #557347;
+  --container: 1440px;
+  --gutter: 64px;
+  --gap-columns: 32px;
+  --section-gap-s: 120px;
+  --section-gap: 144px;
+  --section-gap-l: 176px;
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  --color-paper: #FBF5EA;
+  --color-paper-2: #FFFCF7;
+  --color-paper-3: #ECEEDC;
+  --color-ink: #20372C;
+  --color-ink-2: #234C3B;
+  --color-muted: #5E6A5B;
+  --color-rule: #D4D7C2;
+  --color-accent: #F2C94C;
+  --color-accent-ink: #20372C;
+  --color-focus: #234C3B;
+
+  --font-display: 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Segoe UI', system-ui, sans-serif;
+  --font-outlier: var(--font-body);
+
+  --radius-card: 8px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
+  --shadow-card: none;
+  --tracking-display: -0.02em;
+
+  /* Słońce i las brand tokens */
+  --or-yellow: #F2C94C;
+  --or-yellow-hover: #F8D96E;
+  --or-yellow-soft: #F8DF91;
+  --or-forest: #234C3B;
+  --or-forest-hover: #19392C;
+  --or-cream: #FBF5EA;
+  --or-paper: #FFFCF7;
+  --or-sand: #ECEEDC;
+  --or-sand-hover: #DDE3CF;
+  --or-card-hover: #F5F6EB;
+  --or-card-active: #EDF2E5;
+  --or-gpx-bg: #FAF3D4;
+  --or-gpx-border: #817126;
+  --or-border: #D4D7C2;
+  --or-input-border: #82917A;
+  --or-ble-border: #A4B29A;
+  --or-route-stroke: #718365;
+  --or-ink: #20372C;
+  --or-muted: #5E6A5B;
+  --or-deep-green: #172B23;
+  --or-deep-green-raised: #243D31;
+  --or-deep-green-hover: #314E40;
+  --or-hud-surface: #1A3027;
+  --or-hud-inset: #13241D;
+  --or-hud-well: #0F1E18;
+  --or-hud-border: #335244;
+  --or-hud-rule: #2A4639;
+  --or-dark-muted: #CAD6C1;
+  --or-sage: #557347;
+  --or-sage-border: #BACFA6;
+  --or-sage-soft: #E7EDDF;
+  --or-hr-rose: #F3A09B;
+  --or-ghost-lavender: #D7BFE4;
+  --or-error: #A83F45;
+  --or-error-soft: #F8E5E3;
+  --or-tag-tech-bg: #F8EDBD;
+  --or-tag-tech-ink: #6D5B15;
+  --or-tag-flat-bg: #E3EAE7;
+  --or-tag-flat-ink: #405F54;
+  --or-backdrop: rgba(15, 30, 22, 0.82);
+  --or-self-bg: rgba(242, 201, 76, 0.14);
+  --or-self-border: rgba(242, 201, 76, 0.48);
+  --or-zone-pill-bg: rgba(15, 30, 24, 0.28);
+  --or-focus: #234C3B;
+  --or-strava: #B73600;
+  --or-strava-hover: #992D00;
+}

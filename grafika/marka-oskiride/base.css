@@ -1,0 +1,31 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: brand · redesign: full
+ * paper: oklch(97% 0.02 85) · accent: oklch(84% 0.15 88) · display: Segoe UI · body: Segoe UI
+ * nav: kept · signature: live route elevation workbench · states: hover, focus-visible, active, disabled, aria-pressed
+ * axes: light/grotesk-sans/warm · posture: instrument · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P9 H9 E9 S9 R9 V9 · weakest: S, unified base typography and focus states */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; overflow-y: hidden; width: 100%; height: 100%; margin: 0; padding: 0; user-select: none; }
+html { scrollbar-color: var(--color-muted) var(--color-paper); scroll-padding-top: var(--space-3xl); }
+body { background: var(--or-deep-green); color: var(--or-cream); font-family: var(--font-body); font-size: var(--text-md); line-height: 1.4; -webkit-font-smoothing: antialiased; caret-color: var(--color-accent); }
+body * { font-family: inherit; }
+::selection { background: color-mix(in oklab, var(--color-accent) 22%, transparent); color: var(--color-ink); }
+:focus-visible { outline: 3px solid var(--or-focus); outline-offset: 2px; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 650; font-synthesis: none; letter-spacing: var(--tracking-display); line-height: 1.15; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
+h1 { max-width: 24ch; font-size: var(--text-display); }
+h2 { max-width: 32ch; font-size: var(--text-section); }
+h3 { max-width: 40ch; font-size: var(--text-title); line-height: 1.2; }
+p { margin: 0; text-wrap: pretty; }
+img, video { max-width: 100%; height: auto; display: block; }
+svg { display: block; }
+[hidden], .hidden { display: none !important; }
+button, input, select, textarea { font: inherit; }
+.num, .figure, td.num, .stat-value, .metric-val, .power-value, .gradient-value { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  *:not(.keep-motion), *:not(.keep-motion)::before, *:not(.keep-motion)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

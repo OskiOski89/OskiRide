@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="ZwiftGPX3D" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Przełęcz Górska - Test GPX</name>
+    <trkseg>
+      <trkpt lat="49.25000" lon="19.95000"><ele>500.0</ele></trkpt>
+      <trkpt lat="49.25050" lon="19.95020"><ele>502.5</ele></trkpt>
+      <trkpt lat="49.25100" lon="19.95060"><ele>506.0</ele></trkpt>
+      <trkpt lat="49.25150" lon="19.95120"><ele>511.2</ele></trkpt>
+      <trkpt lat="49.25200" lon="19.95200"><ele>517.5</ele></trkpt>
+      <trkpt lat="49.25250" lon="19.95240"><ele>524.0</ele></trkpt>
+      <trkpt lat="49.25300" lon="19.95210"><ele>531.0</ele></trkpt>
+      <trkpt lat="49.25340" lon="19.95140"><ele>537.5</ele></trkpt>
+      <trkpt lat="49.25380" lon="19.95070"><ele>543.8</ele></trkpt>
+      <trkpt lat="49.25430" lon="19.95050"><ele>549.5</ele></trkpt>
+      <trkpt lat="49.25480" lon="19.95090"><ele>555.0</ele></trkpt>
+      <trkpt lat="49.25530" lon="19.95160"><ele>559.0</ele></trkpt>
+      <trkpt lat="49.25580" lon="19.95240"><ele>561.5</ele></trkpt>
+      <trkpt lat="49.25630" lon="19.95320"><ele>560.0</ele></trkpt>
+      <trkpt lat="49.25680" lon="19.95390"><ele>556.0</ele></trkpt>
+      <trkpt lat="49.25730" lon="19.95450"><ele>550.5</ele></trkpt>
+      <trkpt lat="49.25780" lon="19.95500"><ele>544.0</ele></trkpt>
+      <trkpt lat="49.25830" lon="19.95530"><ele>539.0</ele></trkpt>
+      <trkpt lat="49.25880" lon="19.95540"><ele>536.0</ele></trkpt>
+      <trkpt lat="49.25930" lon="19.95550"><ele>535.5</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

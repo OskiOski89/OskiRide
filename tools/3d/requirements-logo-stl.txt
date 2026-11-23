@@ -1,0 +1,7 @@
+Pillow>=10
+numpy==2.5.4
+opencv-python-headless==5.0.0.93
+shapely==2.2.0
+trimesh==5.2.0
+mapbox-earcut==2.1.0
+manifold3d==3.5.4

@@ -1,0 +1,70 @@
+{
+  "name": "oskiride",
+  "version": "1.0.1",
+  "description": "A 3D cycling simulator for GPX routes, indoor workouts, and Bluetooth smart trainers.",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "node server.js",
+    "test:consistency": "node tests/consistency/run.cjs",
+    "desktop": "electron .",
+    "build:win": "electron-builder --win --x64 --publish never",
+    "build:mac": "electron-builder --mac --publish never"
+  },
+  "keywords": [
+    "oskiride",
+    "zwift",
+    "gpx",
+    "cycling",
+    "ftms",
+    "bluetooth",
+    "threejs",
+    "smart-trainer"
+  ],
+  "author": "OskiRide",
+  "license": "MIT",
+  "build": {
+    "appId": "com.oskiride.app",
+    "productName": "OskiRide",
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    },
+    "files": [
+      "electron-main.js",
+      "shifter-preload.cjs",
+      "index.html",
+      "style.css",
+      "src/**/*",
+      "grafika/index.html",
+      "grafika/kinematyka.js",
+      "grafika/kolarz.js",
+      "grafika/kolarz-0[1-4]-*.glb",
+      "grafika/modele.json",
+      "grafika/studio.css",
+      "grafika/studio.js",
+      "grafika/slonce-i-las/**/*",
+      "grafika/vendor/**/*",
+      "grafika/marka-oskiride/*.css",
+      "grafika/marka-oskiride/oskiride-icon.*",
+      "grafika/marka-oskiride/oskiride-logo.png",
+      "grafika/kibice/0[1-9]-*.glb",
+      "grafika/kibice/1[0-2]-*.glb",
+      "grafika/kibice/modele.json"
+    ],
+    "win": {
+      "icon": "grafika/marka-oskiride/oskiride-icon.ico",
+      "target": "nsis",
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "icon": "grafika/marka-oskiride/oskiride-icon.png"
+    }
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  }
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="OskiRide — test syntetyczny" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Trasa testowa OskiRide</name>
+    <trkseg>
+      <trkpt lat="50.000" lon="20.000"><ele>220</ele></trkpt>
+      <trkpt lat="50.004" lon="20.002"><ele>228</ele></trkpt>
+      <trkpt lat="50.008" lon="20.004"><ele>239</ele></trkpt>
+      <trkpt lat="50.012" lon="20.006"><ele>254</ele></trkpt>
+      <trkpt lat="50.016" lon="20.007"><ele>271</ele></trkpt>
+      <trkpt lat="50.020" lon="20.009"><ele>278</ele></trkpt>
+      <trkpt lat="50.024" lon="20.011"><ele>285</ele></trkpt>
+      <trkpt lat="50.028" lon="20.014"><ele>272</ele></trkpt>
+      <trkpt lat="50.032" lon="20.017"><ele>263</ele></trkpt>
+      <trkpt lat="50.036" lon="20.021"><ele>257</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

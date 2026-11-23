@@ -1,0 +1,1667 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: brand · redesign: full
+ * paper: oklch(97% 0.02 85) · accent: oklch(84% 0.15 88) · display: Segoe UI · body: Segoe UI
+ * nav: kept · signature: live route elevation workbench · states: hover, focus-visible, active, disabled, aria-pressed
+ * axes: light/grotesk-sans/warm · posture: instrument · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P9 H9 E9 S9 R9 V9 · weakest: S, aligned every HUD and modal rule onto the --space-* token scale and Słońce i las tokens */
+@import url("./grafika/marka-oskiride/tokens.css");
+@import url("./grafika/marka-oskiride/base.css");
+
+/* Web Interface Guidelines: Accessibility, Theming, Touch & Scroll containment */
+:root, html {
+  color-scheme: dark;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 16px;
+  background: var(--or-yellow, #f2c94c);
+  color: var(--or-forest, #234c3b);
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 6px;
+  z-index: 99999;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus-visible {
+  top: 16px;
+  outline: 3px solid var(--or-forest, #234c3b);
+}
+
+button, input, select, a, .route-card, .workout-preset-card {
+  touch-action: manipulation;
+}
+
+.modal-shell,
+.main-menu-shell,
+.summary-modal-shell,
+.pairing-modal-shell,
+.spindown-modal-shell {
+  overscroll-behavior: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+#canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-base);
+}
+
+.hud-panel {
+  position: absolute;
+  z-index: var(--z-raised);
+  background: var(--or-hud-surface);
+  color: var(--or-cream);
+  border: 1px solid var(--or-hud-border);
+  border-radius: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Center Alerts Stack (Drafting, Course Hazard, ClimbPro) */
+#alerts-stack {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  pointer-events: none;
+}
+
+.alert-pill {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--or-cream);
+}
+
+.draft-pill {
+  background: var(--or-deep-green);
+  color: var(--or-cream);
+  border: 1px solid var(--or-sage-border);
+}
+
+.hazard-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--or-deep-green);
+  color: var(--or-cream);
+  border: 1px solid var(--or-yellow);
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-sm);
+  min-width: 384px;
+}
+
+.hazard-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--or-yellow);
+  color: var(--or-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hazard-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  text-align: left;
+  flex: 1;
+}
+
+.hazard-title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--or-cream);
+  line-height: 1.15;
+}
+
+.hazard-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-yellow-soft);
+}
+
+.hazard-dist-badge {
+  background: var(--or-error);
+  color: var(--or-paper);
+  font-size: 16px;
+  font-weight: 650;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 8px;
+  border: 1px solid var(--or-hr-rose);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.climbpro-card {
+  background: var(--or-deep-green);
+  color: var(--or-cream);
+  border: 1px solid var(--or-yellow);
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-md);
+  min-width: 384px;
+}
+
+.climbpro-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--or-yellow-soft);
+  margin-bottom: var(--space-xs);
+}
+
+.climbpro-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: var(--or-hud-inset);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.climbpro-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--or-yellow);
+  transition: opacity 0.16s ease;
+}
+
+/* Top Left: Brand, Power, Speed, Cadence, HR, Averages */
+#hud-top-left {
+  top: 16px;
+  left: 16px;
+  padding: var(--space-sm);
+  min-width: 312px;
+  width: 312px;
+}
+
+.brand-header {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--or-cream);
+  margin-bottom: var(--space-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.header-right-pills {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.fps-badge {
+  color: var(--or-dark-muted);
+  font-size: 12px;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.top-menu-btn {
+  background: var(--or-deep-green-raised);
+  color: var(--or-cream);
+  border: 1px solid var(--or-hud-border);
+  border-radius: 6px;
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.12s ease, opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.top-menu-btn:hover {
+  background: var(--or-deep-green-hover);
+}
+
+.top-menu-btn:active {
+  transform: translateY(1px);
+}
+
+.top-menu-btn:disabled,
+.top-menu-btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gear-badge-val {
+  color: var(--or-yellow);
+}
+
+.power-box {
+  background: var(--or-forest);
+  color: var(--or-paper);
+  border-radius: 8px;
+  padding: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  transition: background-color 0.22s ease;
+}
+
+.power-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.power-main {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+}
+
+.power-value {
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.power-w {
+  font-size: 20px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.power-right-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2xs);
+}
+
+.wkg-pill {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--or-paper);
+}
+
+.power-zone-badge {
+  background: var(--or-zone-pill-bg);
+  color: var(--or-paper);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* 7-Segment Coggan Power Zone Ribbon */
+.power-ribbon-track {
+  display: flex;
+  gap: 2px;
+  margin-top: var(--space-2xs);
+  padding: 2px;
+  background: var(--or-hud-inset);
+  border-radius: 4px;
+  border: 1px solid var(--or-hud-rule);
+}
+
+.ribbon-seg {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+  transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.ribbon-seg.active[data-zone="1"] { background: #94a3b8; color: #0f172a; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="2"] { background: #3b82f6; color: #ffffff; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="3"] { background: #22c55e; color: #052e16; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="4"] { background: #eab308; color: #422006; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="5"] { background: #f97316; color: #ffffff; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="6"] { background: #ef4444; color: #ffffff; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.ribbon-seg.active[data-zone="7"] { background: #a855f7; color: #ffffff; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+
+.metrics-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+
+.metric {
+  flex: 1;
+  background: var(--or-hud-inset);
+  color: var(--or-cream);
+  border: 1px solid var(--or-hud-rule);
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-2xs);
+  text-align: center;
+}
+
+.metric-label {
+  display: block;
+  font-size: 12px;
+  color: var(--or-dark-muted);
+  font-weight: 500;
+  margin-bottom: var(--space-2xs);
+}
+
+.metric-val {
+  display: block;
+  font-size: 27px;
+  font-weight: 650;
+  line-height: 1.05;
+  color: var(--or-cream);
+}
+
+.metric-val.speed-val {
+  color: var(--or-cream);
+}
+
+.metric-val.cad-val {
+  color: var(--or-yellow);
+  transition: color 0.2s ease;
+}
+
+.metric-val.cad-val.cad-optimal {
+  color: #4ade80;
+}
+
+.metric-val.cad-val.cad-grind {
+  color: #fb923c;
+}
+
+.metric-val.cad-val.cad-spin {
+  color: #38bdf8;
+}
+
+.cadence-coach-pill {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 3px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--or-dark-muted);
+  background: rgba(255, 255, 255, 0.05);
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cadence-coach-pill.coach-optimal {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.16);
+}
+
+.cadence-coach-pill.coach-grind {
+  color: #fb923c;
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.cadence-coach-pill.coach-spin {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.18);
+}
+
+.metric-val.hr-val {
+  color: var(--or-hr-rose);
+}
+
+.metric-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+}
+
+.averages-row {
+  display: flex;
+  justify-content: space-between;
+  background: var(--or-hud-well);
+  color: var(--or-cream);
+  padding: var(--space-xs);
+  border-radius: 8px;
+  border: 1px solid var(--or-hud-rule);
+}
+
+.avg-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.avg-item span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+}
+
+.avg-item strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--or-cream);
+}
+
+/* Top Center: Distance, Elevation, Remaining, Time, Ghost */
+#hud-top-center {
+  top: 16px;
+  left: calc(50% + 40px);
+  transform: translateX(-50%);
+  width: calc(100% - 624px);
+  max-width: 680px;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.center-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+}
+
+.stat-value {
+  font-size: 25px;
+  font-weight: 650;
+  line-height: 1.05;
+  color: var(--or-cream);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-value small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--or-dark-muted);
+}
+
+.ghost-stat {
+  border-left: 1px solid var(--or-hud-border);
+  padding-left: var(--space-md);
+}
+
+#hud-ghost-gap,
+#hud-record-ghost-gap {
+  font-size: 19px;
+  white-space: nowrap;
+}
+
+#hud-top-center:has(#record-ghost-stat-box:not(.hidden)) {
+  max-width: 748px;
+  gap: var(--space-sm);
+}
+
+#hud-top-center:has(#record-ghost-stat-box:not(.hidden)) .ghost-stat {
+  padding-left: var(--space-sm);
+}
+
+#hud-top-center:has(#record-ghost-stat-box:not(.hidden)) #hud-ghost-gap,
+#hud-top-center:has(#record-ghost-stat-box:not(.hidden)) #hud-record-ghost-gap {
+  font-size: 16px;
+}
+
+/* Top Right: Gradient, Minimap & Nearby Riders */
+#hud-top-right {
+  top: 16px;
+  right: 16px;
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 232px;
+}
+
+.gradient-box {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 8px;
+  background: var(--or-hud-inset);
+  color: var(--or-cream);
+  border: 1px solid var(--or-hud-rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gradient-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+}
+
+.altitude-sub {
+  font-size: 12px;
+  color: var(--or-yellow);
+  font-weight: 500;
+  margin-top: var(--space-2xs);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.wind-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--or-cream);
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.wind-badge.wind-tail {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.45);
+}
+
+.wind-badge .ui-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.workout-import-status {
+  margin: 0;
+  color: var(--or-forest);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.workout-import-status.is-error {
+  color: var(--or-error);
+}
+
+.wind-badge.wind-head {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.wind-badge.wind-cross {
+  color: #facc15;
+  border-color: rgba(250, 204, 21, 0.45);
+}
+
+.gradient-value {
+  font-size: 29px;
+  font-weight: 650;
+  color: var(--or-cream);
+}
+
+#minimap-canvas {
+  width: 100%;
+  height: auto;
+  background: var(--or-hud-well);
+  border-radius: 8px;
+  border: 1px solid var(--or-hud-rule);
+}
+
+.nearby-box {
+  width: 100%;
+  background: var(--or-hud-well);
+  color: var(--or-cream);
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--or-hud-rule);
+}
+
+.nearby-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+  margin-bottom: var(--space-2xs);
+}
+
+.nearby-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 400;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: 4px;
+  color: var(--or-dark-muted);
+}
+
+.nearby-item.self {
+  background: var(--or-self-bg);
+  border-left: 2px solid var(--or-yellow);
+  border-radius: 0;
+  color: var(--or-yellow);
+  font-weight: 600;
+}
+
+.nearby-item.ghost {
+  color: var(--or-ghost-lavender);
+  font-weight: 600;
+}
+
+.nearby-item.record-ghost {
+  color: var(--or-yellow);
+  font-weight: 600;
+}
+
+#nearby-list:has(.record-ghost) .nearby-item {
+  padding: 2px var(--space-xs);
+  line-height: 1.2;
+}
+
+/* Bottom HUD: Quick Controls & Dual Elevation Profile */
+#hud-bottom {
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(96%, 1260px);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.btn,
+.select-input {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-sm);
+  min-height: 36px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--or-paper);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  opacity: 0.96;
+}
+
+.btn:active,
+.btn-gear:active,
+.btn-icon:active,
+.route-card:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"],
+.btn-gear:disabled,
+.btn-gear[aria-disabled="true"],
+.btn-icon:disabled,
+.btn-icon[aria-disabled="true"],
+.select-input:disabled,
+.select-input[aria-disabled="true"],
+.route-card:disabled,
+.route-card[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select-input {
+  background: var(--or-paper);
+  color: var(--or-ink);
+  border: 1px solid var(--or-input-border);
+}
+
+.btn-primary {
+  background: var(--or-forest);
+  color: var(--or-paper);
+  border-color: var(--or-forest);
+}
+
+.btn-primary:hover {
+  background: var(--or-forest-hover);
+}
+
+.btn-secondary,
+.btn-settings,
+.btn-menu-main {
+  background: var(--or-deep-green-raised);
+  color: var(--or-cream);
+  border-color: var(--or-hud-border);
+}
+
+.btn-secondary:hover,
+.btn-settings:hover,
+.btn-menu-main:hover {
+  background: var(--or-deep-green-hover);
+}
+
+.btn-ble,
+.btn-success,
+.btn-ble.connected,
+#btn-zwift-connect.connected {
+  background: var(--or-sage);
+  color: var(--or-paper);
+  border-color: var(--or-sage);
+}
+
+.gear-shifter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--or-hud-inset);
+  border: 1px solid var(--or-hud-rule);
+  border-radius: 8px;
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-yellow);
+}
+
+.btn-gear {
+  background: var(--or-deep-green-raised);
+  color: var(--or-cream);
+  border: 1px solid var(--or-hud-border);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 0.12s ease, background-color 0.15s ease;
+}
+
+.btn-gear:hover {
+  background: var(--or-deep-green-hover);
+}
+
+.sim-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  background: var(--or-hud-inset);
+  color: var(--or-dark-muted);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 8px;
+  border: 1px solid var(--or-hud-rule);
+}
+
+.sim-controls strong {
+  color: var(--or-yellow);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sim-controls input[type="range"] {
+  width: 112px;
+  accent-color: var(--or-forest);
+  cursor: pointer;
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.profile-box {
+  background: var(--or-hud-well);
+  color: var(--or-dark-muted);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--or-hud-rule);
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--or-dark-muted);
+  padding: var(--space-2xs) var(--space-sm);
+  background: var(--or-hud-inset);
+}
+
+#elevation-canvas,
+#zoom-elevation-canvas {
+  width: 100%;
+  height: 84px;
+  display: block;
+}
+
+#elevation-canvas {
+  cursor: pointer;
+}
+
+#status-bar {
+  font-size: 12px;
+  color: var(--or-dark-muted);
+  text-align: center;
+}
+
+#ble-status {
+  color: var(--or-yellow);
+  font-weight: 500;
+}
+
+
+/* ============================================================================
+ * FEATURE 1 & 5: WORKOUT HUD WIDGET, CLIMBPRO CHALLENGER & WORKOUTS MENU
+ * ============================================================================ */
+
+/* Structured Workout HUD Widget */
+.workout-card {
+  background: var(--or-deep-green);
+  color: var(--or-cream);
+  border: 1px solid var(--or-yellow);
+  border-radius: 8px;
+  padding: var(--space-xs) var(--space-md);
+  min-width: 384px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xs);
+}
+
+.workout-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--or-yellow);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workout-pills {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.badge-erg {
+  background: var(--or-yellow);
+  color: var(--or-ink);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.workout-timer {
+  font-size: 15px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: var(--or-cream);
+}
+
+.workout-targets-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--or-yellow-soft);
+  margin-bottom: var(--space-2xs);
+}
+
+.workout-target-item strong {
+  color: var(--or-cream);
+  font-weight: 700;
+}
+
+.workout-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: var(--or-hud-inset);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.workout-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--or-yellow);
+  border-radius: var(--radius-pill);
+  transition: width 0.25s ease, background-color 0.3s ease;
+}
+
+/* ClimbPro KOM/PR Challenger live ribbon */
+.climbpro-challenger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xs);
+  padding-top: var(--space-2xs);
+  border-top: 1px dashed rgba(242, 201, 76, 0.35);
+  font-size: 12px;
+}
+
+.challenger-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.challenger-label {
+  color: var(--or-yellow-soft);
+  font-size: 12px;
+}
+
+.challenger-badge {
+  font-weight: 750;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.challenger-badge.ahead {
+  background: rgba(34, 197, 94, 0.22);
+  color: #4ade80;
+  border: 1px solid #22c55e;
+}
+
+.challenger-badge.behind {
+  background: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+  border: 1px solid #ef4444;
+}
+
+.challenger-ele {
+  color: var(--or-cream);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Menu Workouts Section */
+.workout-actions-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.workout-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: var(--space-2xs);
+}
+
+.workout-preset-card {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--or-border);
+  border-radius: 8px;
+  background: var(--or-paper);
+  color: var(--or-ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.12s ease;
+}
+
+.workout-preset-card:hover {
+  background: var(--or-card-hover);
+  border-color: var(--or-forest);
+}
+
+.workout-preset-card.active {
+  border-color: var(--or-forest);
+  background: var(--or-card-active);
+  box-shadow: 0 0 0 2px var(--or-yellow);
+}
+
+.workout-preset-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workout-preset-category {
+  font-size: var(--text-xs);
+  font-weight: 650;
+  text-transform: uppercase;
+  color: var(--or-forest);
+  letter-spacing: 0.4px;
+}
+
+.workout-preset-duration {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--or-muted);
+}
+
+.workout-preset-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--or-ink);
+}
+
+.workout-preset-desc {
+  font-size: var(--text-sm);
+  color: var(--or-muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.workout-active-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--or-sand);
+  border: 1px solid var(--or-border);
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-md);
+}
+
+.workout-active-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workout-active-label {
+  font-size: 12px;
+  color: var(--or-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#workout-active-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--or-ink);
+}
+
+.workout-active-meta {
+  font-size: 12px;
+  color: var(--or-muted);
+}
+
+.workout-active-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.workout-erg-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--or-ink);
+  cursor: pointer;
+  user-select: none;
+}
+
+.workout-erg-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--or-forest);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Realism Badge, Device Pairing (Zwift-Style Grid) & Spindown Calibration
+   ========================================================================== */
+.realism-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  margin-left: 8px;
+  user-select: none;
+}
+
+.realism-badge.realism-ok {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.realism-badge.realism-warn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  animation: pulse-warn 1.8s infinite;
+}
+
+.realism-badge.realism-muted {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--or-muted);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@keyframes pulse-warn {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.realism-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--or-hud-border);
+  background: var(--or-deep-green-raised);
+}
+
+.realism-banner.realism-ok {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(23, 43, 35, 0.95);
+}
+
+.realism-banner.realism-warn {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(45, 20, 22, 0.95);
+}
+
+.realism-banner-icon {
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--or-yellow);
+}
+
+.realism-banner-icon .ui-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.realism-banner-info {
+  flex: 1;
+}
+
+.realism-banner-info strong {
+  display: block;
+  font-size: 14px;
+  color: var(--or-cream);
+  margin-bottom: 2px;
+}
+
+.realism-banner-info p {
+  font-size: var(--text-sm);
+  color: var(--or-dark-muted);
+  margin: 0;
+}
+
+.realism-pill {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.realism-banner.realism-ok .realism-pill {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid #4ade80;
+}
+
+.realism-banner.realism-warn .realism-pill {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid #f87171;
+}
+
+.realism-banner.realism-muted .realism-pill {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--or-dark-muted);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Kafelki parowania Zwift Style */
+.pairing-modal-shell {
+  max-width: 920px;
+  width: 95vw;
+}
+
+.pairing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .pairing-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.device-card {
+  min-width: 0;
+  background: var(--or-hud-surface);
+  border: 1px solid var(--or-hud-rule);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 224px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.device-card.connected {
+  border-color: var(--or-yellow);
+  background: rgba(35, 76, 59, 0.5);
+  box-shadow: 0 0 16px rgba(242, 201, 76, 0.2);
+}
+
+.device-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.device-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(35, 76, 59, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--or-yellow);
+}
+
+.device-card-icon .ui-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.device-card.connected .device-card-icon {
+  background: var(--or-yellow);
+  color: var(--or-deep-green);
+  border-color: var(--or-yellow);
+}
+
+.device-card-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-category {
+  display: block;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--or-muted);
+  letter-spacing: 0.5px;
+}
+
+.device-title {
+  font-size: 16px;
+  color: var(--or-cream);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.device-status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--or-muted);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.device-card.connected .device-status-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.device-card-body {
+  flex: 1;
+}
+
+.device-conn-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--or-cream);
+  margin-bottom: 4px;
+}
+
+.device-conn-sub {
+  font-size: 12px;
+  color: var(--or-muted);
+}
+
+.device-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--or-muted);
+  margin-bottom: 6px;
+}
+
+.zpower-select {
+  width: 100%;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.device-setting-hint {
+  font-size: 12px;
+  color: var(--or-yellow);
+  font-weight: 500;
+}
+
+.device-card-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.device-card-actions .btn {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: 6px;
+}
+
+.device-card .btn-pair {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--or-cream);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.device-card .btn-pair:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--or-yellow);
+  color: #ffffff;
+}
+
+.device-card .btn-spindown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(242, 201, 76, 0.12);
+  color: var(--or-yellow);
+  border: 1px solid rgba(242, 201, 76, 0.35);
+}
+
+.device-card .btn-spindown:hover {
+  background: rgba(242, 201, 76, 0.22);
+}
+
+.device-card .btn-spindown .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.pairing-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--or-hud-rule);
+}
+
+@media (max-width: 600px) {
+  .pairing-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pairing-footer .btn {
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .device-card-header {
+    flex-wrap: wrap;
+  }
+}
+
+/* Modal Kalibracji Spindown */
+.spindown-modal-shell {
+  max-width: 580px;
+  width: 90vw;
+}
+
+.spindown-content {
+  margin: var(--space-md) 0;
+}
+
+.spindown-instruction-card {
+  background: var(--or-hud-surface);
+  border: 1px solid var(--or-hud-rule);
+  border-radius: 8px;
+  padding: var(--space-md);
+}
+
+.spindown-instruction-card h3 {
+  font-size: 14px;
+  color: var(--or-yellow);
+  margin-bottom: var(--space-xs);
+}
+
+.spindown-instruction-card ul {
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--or-cream);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.spindown-phase-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--or-cream);
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.spindown-gauge-wrap {
+  background: var(--or-hud-surface);
+  border: 1px solid var(--or-hud-border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.spindown-speed-display {
+  font-size: 48px;
+  font-weight: 800;
+  font-family: monospace;
+  color: var(--or-yellow);
+}
+
+.spindown-speed-display small {
+  font-size: 20px;
+  color: var(--or-cream);
+  font-weight: 500;
+}
+
+.spindown-target-text {
+  font-size: 13px;
+  color: var(--or-muted);
+  margin-bottom: 16px;
+}
+
+.spindown-bar-track {
+  height: 14px;
+  background: var(--or-hud-inset);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--or-hud-rule);
+}
+
+.spindown-bar-fill {
+  height: 100%;
+  background: var(--or-yellow);
+  transition: width 0.1s linear;
+}
+
+.spindown-prompt {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--or-cream);
+  text-align: center;
+  margin-top: 14px;
+}
+
+.spindown-prompt.pulse {
+  color: #f87171;
+  animation: pulse-warn 0.8s infinite;
+}
+
+.spindown-success-card {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+}
+
+.spindown-success-card .success-icon {
+  font-size: 42px;
+  color: #4ade80;
+  margin-bottom: 8px;
+}
+
+.spindown-success-card h3 {
+  font-size: 18px;
+  color: var(--or-cream);
+  margin-bottom: 6px;
+}
+
+.spindown-success-card p {
+  font-size: 13px;
+  color: var(--or-muted);
+  margin-bottom: 16px;
+}
+
+.spindown-result-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--or-cream);
+  background: var(--or-deep-green-raised);
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--or-hud-border);
+}
+
+.spindown-result-stat strong {
+  color: var(--or-yellow);
+  font-size: 16px;
+}
+
+/* Przycisk Zakończ trening i integracja ze Stravą */
+.btn-finish-ride {
+  background: var(--or-yellow);
+  color: var(--or-deep-green);
+  border-color: var(--or-yellow);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.btn-finish-ride:hover {
+  background: #e5be42;
+  border-color: #e5be42;
+  color: var(--or-deep-green);
+}
+
+.btn-strava {
+  background: var(--or-strava);
+  color: #ffffff;
+  border-color: var(--or-strava);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-strava:hover {
+  background: var(--or-strava-hover);
+  border-color: var(--or-strava-hover);
+  color: #ffffff;
+}

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OskiRide — 3D Cycling Simulator</title>
+  <meta name="description" content="A 3D cycling simulator for GPX routes, indoor workouts, and Bluetooth smart trainers." />
+  <link rel="stylesheet" href="style.css?v=8" />
+  <meta name="theme-color" content="#234C3B" />
+  <link rel="icon" type="image/svg+xml" href="grafika/marka-oskiride/oskiride-icon.svg?v=2" />
+  <link rel="icon" type="image/png" href="grafika/marka-oskiride/oskiride-icon.png?v=2" />
+  <link rel="shortcut icon" href="grafika/marka-oskiride/oskiride-icon.ico?v=2" />
+  <link rel="stylesheet" href="grafika/marka-oskiride/theme.css?v=7" />
+  <link rel="stylesheet" href="src/ui/rideLogs.css?v=20261030" />
+  <link rel="stylesheet" href="src/ui/deviceTest.css?v=20261030" />
+  <link rel="stylesheet" href="src/ui/routeLibrary.css?v=20261030" />
+  <link rel="stylesheet" href="src/ui/rideJournal.css?v=20261116" />
+  <link rel="stylesheet" href="src/ui/zwiftShifter.css?v=20261116-zwift-click" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./grafika/vendor/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Web Interface Guidelines: Skip Link -->
+  <a href="#hud-top-left" class="skip-link">Skip to main content</a>
+
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+    <filter id="oskiride-logo-on-dark" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="-0.043478 0 0 0 0.990281  -0.212560 0 0 0 0.990104  -0.763285 0 0 0 1.022412  0 0 0 1 0" />
+    </filter>
+    <symbol id="icon-wind-head" viewBox="0 0 24 24"><path d="M12 20V4m-6 6 6-6 6 6" /></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 4v16M16 4v16" /></symbol>
+    <symbol id="icon-wind-tail" viewBox="0 0 24 24"><path d="M12 4v16m-6-6 6 6 6-6" /></symbol>
+    <symbol id="icon-wind-cross" viewBox="0 0 24 24"><path d="M3 12h18M7 8l-4 4 4 4m10-8 4 4-4 4" /></symbol>
+    <path id="shifter-dpad-shape" d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6Z" />
+    <symbol id="icon-shifter-dpad" viewBox="0 0 24 24">
+      <use href="#shifter-dpad-shape" fill="currentColor" />
+    </symbol>
+    <symbol id="icon-shifter-dpad-direction" viewBox="0 0 24 24">
+      <use href="#shifter-dpad-shape" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <path d="M8 2h8v6H8Z" fill="currentColor" />
+    </symbol>
+  </defs></svg>
+  <template id="shifter-direction-glyph">
+    <svg class="shifter-dpad" viewBox="0 0 24 24" role="img"><use href="#icon-shifter-dpad-direction" /></svg>
+  </template>
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0"><defs><symbol id="icon-link" viewBox="0 0 24 24"><path d="M12 3v18m0-18 6 6-12 6 6 6 6-6-12-6"/></symbol><symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z"/></symbol><symbol id="icon-controller" viewBox="0 0 24 24"><path d="M6 11h4M8 9v4m6-2h.01M17 13h.01M6 19 3 8a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3l-3 11a3 3 0 0 1-5-2l-2-2-2 2a3 3 0 0 1-5 2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol><symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol><symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></symbol><symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="icon-restart" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6"/></symbol><symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6m8 4v6"/></symbol><symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol><symbol id="icon-trainer" viewBox="0 0 24 24"><circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 18V8l3-4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13l3-5 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="5" r="1" fill="currentColor"/></symbol><symbol id="icon-bolt" viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="icon-speed" viewBox="0 0 24 24"><path d="M12 4a9 9 0 0 0-9 9c0 2.5 1 4.7 2.6 6.3L12 12V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="m14 11 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol></defs></svg>
+  <!-- 3D World Canvas -->
+  <div id="canvas-container"></div>
+
+  <button type="button" id="trainer-connection-indicator" class="trainer-connection-indicator" data-state="disconnected" aria-label="Trainer disconnected. Open devices." title="Trainer disconnected. Open devices."><span aria-hidden="true"></span></button>
+
+  <!-- Center Alerts Stack (Drafting, Course Hazard, ClimbPro, Structured Workout) -->
+  <div id="alerts-stack" role="region" aria-label="Ride alerts" aria-live="polite" aria-atomic="true">
+    <div id="trainer-pause-banner" class="trainer-pause-banner" hidden>
+      <div><strong id="trainer-pause-title">Paused — trainer disconnected</strong><p id="trainer-pause-description">Reconnect your trainer. Ride and interval timers are paused.</p></div>
+      <button type="button" id="btn-trainer-resume" class="btn btn-primary" disabled>Resume ride</button>
+    </div>
+    <ul id="shifter-ride-alerts" class="shifter-ride-alerts" aria-label="Controller alerts" hidden></ul>
+    <div id="draft-banner" class="alert-pill draft-pill hidden">
+      Drafting (25% less resistance)
+    </div>
+    <div id="workout-banner" class="workout-card hidden">
+      <div class="workout-header">
+        <span id="workout-step-title" class="workout-title">Sweet spot interval</span>
+        <div class="workout-pills">
+          <span id="workout-erg-badge" class="badge-erg">ERG</span>
+          <span id="workout-step-timer" class="workout-timer">00:00</span>
+        </div>
+      </div>
+      <div class="workout-targets-row">
+        <span class="workout-target-item">Target: <strong id="workout-target-watts">225 W</strong></span>
+        <span id="workout-target-cad-col" class="workout-target-item">Cadence: <strong id="workout-target-cad">90 rpm</strong></span>
+        <span class="workout-target-item">Step: <strong id="workout-step-num">1/5</strong></span>
+      </div>
+      <div class="workout-bar-bg">
+        <div id="workout-bar-fill" class="workout-bar-fill"></div>
+      </div>
+    </div>
+    <div id="hazard-banner" class="hazard-card hidden">
+      <div id="hazard-icon" class="hazard-icon-box"></div>
+      <div class="hazard-text-col">
+        <span id="hazard-title" class="hazard-title">Left turn</span>
+        <span id="hazard-subtitle" class="hazard-sub" style="display: none;"></span>
+      </div>
+      <div id="hazard-dist" class="hazard-dist-badge">In 100 m</div>
+    </div>
+    <div id="climbpro-banner" class="climbpro-card hidden">
+      <div class="climbpro-header">
+        <span id="climbpro-title">Climb 1 (Cat. 2)</span>
+        <span id="climbpro-stats">To summit: 1.20 km (avg. 6.5%)</span>
+      </div>
+      <div class="climbpro-bar-bg">
+        <div id="climbpro-bar-fill" class="climbpro-bar-fill"></div>
+      </div>
+      <div id="climbpro-challenger" class="climbpro-challenger-row hidden">
+        <div class="challenger-stat">
+          <span class="challenger-label">KOM / PR ghost:</span>
+          <span id="climbpro-challenger-badge" class="challenger-badge ahead">+42 m (−4.2 s)</span>
+        </div>
+        <div class="challenger-stat">
+          <span class="challenger-label">Elevation gain:</span>
+          <span id="climbpro-challenger-ele" class="challenger-ele">To summit: +180 m</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Left: OskiRide Power (with FTP Zone), Speed, Cadence, HR, Gear & Averages -->
+  <div id="hud-top-left" class="hud-panel">
+    <div class="brand-header">
+      <div class="brand-logo-frame brand-logo-hud"><img src="grafika/marka-oskiride/oskiride-logo.png?v=2" alt="OskiRide" width="2103" height="748" /></div>
+      <div class="header-right-pills">
+        <small id="hud-fps" class="fps-badge hidden">60 FPS</small>
+        <button id="btn-top-menu" class="top-menu-btn" title="Open menu, route selection, and settings (Esc)">
+          <kbd id="shifter-open-menu-key" class="shifter-key shifter-open-menu-key" aria-hidden="true" hidden></kbd>
+          Menu
+        </button>
+      </div>
+    </div>
+
+    <div class="power-box" id="power-box">
+      <div class="power-top-row">
+        <div class="power-main">
+          <span class="power-value" id="hud-watts">0</span>
+          <span class="power-w">W</span>
+        </div>
+        <div class="power-right-col">
+          <div class="wkg-pill" id="hud-wkg">0.0 W/kg</div>
+          <div class="power-zone-badge" id="hud-zone">Z1 Recovery</div>
+        </div>
+      </div>
+      <div class="power-ribbon-track" id="hud-power-ribbon" role="progressbar" aria-label="Coggan power zones Z1–Z7" title="Coggan power zones (Z1–Z7)">
+        <span class="ribbon-seg active" data-zone="1" title="Z1: <55% FTP (Active recovery)">Z1</span>
+        <span class="ribbon-seg" data-zone="2" title="Z2: 56–75% FTP (Endurance)">Z2</span>
+        <span class="ribbon-seg" data-zone="3" title="Z3: 76–90% FTP (Tempo)">Z3</span>
+        <span class="ribbon-seg" data-zone="4" title="Z4: 91–105% FTP (Threshold)">Z4</span>
+        <span class="ribbon-seg" data-zone="5" title="Z5: 106–120% FTP (VO₂max)">Z5</span>
+        <span class="ribbon-seg" data-zone="6" title="Z6: 121–150% FTP (Anaerobic)">Z6</span>
+        <span class="ribbon-seg" data-zone="7" title="Z7: >150% FTP (Neuromuscular / sprint)">Z7</span>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric">
+        <span class="metric-label">Speed</span>
+        <span class="metric-val speed-val" id="hud-speed">0,0</span>
+        <span class="metric-sub">km/h</span>
+      </div>
+      <div class="metric metric-cadence">
+        <span class="metric-label">Cadence</span>
+        <span class="metric-val cad-val" id="hud-cadence">0</span>
+        <span class="metric-sub">rpm</span>
+        <small class="cadence-coach-pill" id="hud-cadence-coach">On target</small>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Heart rate</span>
+        <span class="metric-val hr-val" id="hud-hr">—</span>
+        <span class="metric-sub" id="hud-hr-sub">bpm</span>
+      </div>
+    </div>
+
+    <div class="averages-row">
+      <div class="avg-item">
+        <span>Avg. power</span>
+        <strong id="hud-avg-watts">0 W</strong>
+      </div>
+      <div class="avg-item">
+        <span>Gear</span>
+        <strong id="hud-gear" class="gear-badge-val">Gear 12/24</strong>
+      </div>
+      <div class="avg-item">
+        <span>Finish approach</span>
+        <strong id="hud-eta">00:00</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Center: Distance, Elevation, Remaining, Time & Ghost Gap -->
+  <div id="hud-top-center" class="hud-panel">
+    <div class="center-stat">
+      <span class="stat-label">Distance</span>
+      <span class="stat-value"><span id="hud-distance">0,00</span> <small>km</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">Elevation gain</span>
+      <span class="stat-value"><span id="hud-elevation">0</span> <small>m</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">To finish</span>
+      <span class="stat-value"><span id="hud-remaining">0,00</span> <small>km</small></span>
+    </div>
+    <div class="center-stat">
+      <span class="stat-label">Ride time</span>
+      <span class="stat-value" id="hud-time">00:00</span>
+    </div>
+    <div class="center-stat ghost-stat" id="ghost-stat-box">
+      <span class="stat-label">Virtual ghost</span>
+      <span class="stat-value" id="hud-ghost-gap">00:00</span>
+    </div>
+    <div class="center-stat ghost-stat record-ghost-stat hidden" id="record-ghost-stat-box">
+      <span class="stat-label">Personal best</span>
+      <span class="stat-value" id="hud-record-ghost-gap">00:00</span>
+    </div>
+  </div>
+
+  <!-- Top Right: Gradient, Altitude, Minimap & Nearby Riders -->
+  <div id="hud-top-right" class="hud-panel">
+    <div class="gradient-box">
+      <div class="grade-left">
+        <span class="gradient-label">Grade</span>
+        <div class="altitude-sub"><span id="hud-altitude">0</span> m above sea level · <span id="hud-heading">0° N</span> · <span id="hud-wind" class="wind-badge" title="Wind direction and speed"><svg class="ui-icon" aria-hidden="true"><use href="#icon-wind-cross" /></svg>0 km/h</span></div>
+      </div>
+      <span class="gradient-value" id="hud-grade">0,0%</span>
+    </div>
+    <canvas id="minimap-canvas" width="232" height="142" aria-label="Route minimap"></canvas>
+    <div class="nearby-box">
+      <div class="nearby-title">Riders on route</div>
+      <div id="nearby-list"></div>
+    </div>
+  </div>
+
+  <!-- Bottom: Clean Quick Controls & Large Dual Elevation Profile -->
+  <div id="hud-bottom" class="hud-panel">
+    <div class="controls-bar" id="bottom-controls-bar">
+      <button id="btn-settings" class="btn btn-menu-main" title="Open menu, route selection, and settings (Esc)">
+        Menu and route
+      </button>
+
+      <label class="btn btn-primary" for="gpx-input" tabindex="0" role="button" title="Choose a GPX file or drag it into the window">
+        Import GPX
+      </label>
+      <input type="file" id="gpx-input" name="gpx-input" accept=".gpx,.xml" hidden />
+
+      <button id="btn-camera" class="btn btn-secondary" title="Change camera view (C)">
+        Camera: Chase
+      </button>
+
+      <div class="gear-shifter-bar" title="Virtual shifting (Q and E)">
+        <button id="btn-gear-down" class="btn-gear" aria-label="Shift down">−</button>
+        <span id="hud-gear-bottom">Gear 12</span>
+        <button id="btn-gear-up" class="btn-gear" aria-label="Shift up">+</button>
+      </div>
+
+      <div class="sim-controls">
+        <label for="sim-watts">Power: <strong id="sim-watts-label">0 W</strong></label>
+        <input type="range" id="sim-watts" name="sim-watts" min="0" max="800" value="0" step="5" />
+      </div>
+
+      <button id="btn-session-toggle" class="btn btn-secondary" type="button"><span class="button-label">Start ride</span></button>
+      <span id="hud-session-status" class="session-state" role="status">Ride setup</span>
+      <button id="btn-end-ride" class="btn btn-finish-ride" title="End the ride and open the summary">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg>
+        End ride
+      </button>
+
+      <button id="btn-export-fit" class="btn btn-primary" title="Download a FIT activity file (Garmin / Strava / Wahoo)">
+        Save FIT
+      </button>
+      <button id="btn-export-tcx" class="btn btn-secondary" title="Download a TCX activity file">
+        Save TCX
+      </button>
+    </div>
+
+    <p id="hud-storage-status" class="session-message" role="status" hidden></p>
+    <details class="session-sources">
+      <summary>Data sources and control</summary>
+      <dl class="session-facts"><div><dt>Power</dt><dd data-source-key="power">Keyboard simulation</dd></div><div><dt>Cadence</dt><dd data-source-key="cadence">Estimated</dd></div><div><dt>Heart rate</dt><dd data-source-key="heart">No heart rate monitor</dd></div><div><dt>Resistance</dt><dd data-source-key="control">No Bluetooth control</dd></div></dl>
+    </details>
+    <div class="profiles-grid">
+      <div class="profile-box" title="Click the profile to jump to that point on the route">
+        <div class="profile-label">
+          <span>Route profile</span>
+          <span id="climbs-summary-label">Climbs: 0</span>
+        </div>
+        <canvas id="elevation-canvas" width="700" height="86" aria-label="Elevation profile for the full route"></canvas>
+      </div>
+
+      <div class="profile-box zoom-box" title="Grade ahead for the next 1.5 km">
+        <div class="profile-label">
+          <span>Ahead: 1.5 km</span>
+          <span id="upcoming-avg-grade">Avg. 0.0%</span>
+        </div>
+        <canvas id="zoom-elevation-canvas" width="460" height="86" aria-label="Grade profile for the next 1.5 km"></canvas>
+      </div>
+    </div>
+
+    <div id="status-bar">
+      Status: <span id="ble-status">Keyboard simulation starts at 0 W. Use ↑ and ↓ for power, Q and E for gears, and C for the camera.</span>
+      <span id="hud-realism-badge" class="realism-badge realism-muted" title="Power and resistance status. Open the device panel.">Power source: Keyboard</span>
+    </div>
+  </div>
+
+  <!-- Main ride setup -->
+  <div id="settings-modal" class="modal-backdrop menu-scenic-backdrop">
+    <svg class="menu-scenic-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="slonce-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--or-deep-green)" />
+          <stop offset="58%" stop-color="var(--or-forest)" />
+          <stop offset="100%" stop-color="var(--or-sage)" />
+        </linearGradient>
+        <radialGradient id="slonce-glow" cx="50%" cy="34%" r="38%">
+          <stop offset="0%" stop-color="var(--or-yellow)" stop-opacity="0.55" />
+          <stop offset="48%" stop-color="var(--or-yellow-soft)" stop-opacity="0.18" />
+          <stop offset="100%" stop-color="var(--or-deep-green)" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="1440" height="900" fill="url(#slonce-sky)" />
+      <circle cx="720" cy="300" r="460" fill="url(#slonce-glow)" />
+      <circle cx="720" cy="296" r="108" fill="var(--or-yellow)" opacity="0.88" />
+      <path d="M0 610 L210 430 L390 545 L620 350 L835 510 L1080 330 L1290 485 L1440 410 L1440 900 L0 900 Z" fill="var(--or-forest)" opacity="0.78" />
+      <path d="M0 680 L160 540 L340 630 L540 470 L760 615 L980 455 L1190 595 L1440 500 L1440 900 L0 900 Z" fill="var(--or-forest-hover)" opacity="0.92" />
+      <path d="M0 748 L90 660 L135 735 L195 640 L250 740 L320 650 L380 745 L460 658 L520 748 L1440 748 L1440 900 L0 900 Z" fill="var(--or-deep-green)" />
+      <path d="M920 748 L980 652 L1035 742 L1100 635 L1165 742 L1235 648 L1305 742 L1375 660 L1440 748 L1440 900 L920 900 Z" fill="var(--or-deep-green)" />
+      <path d="M520 900 Q650 760 610 675 Q575 600 720 535 Q815 600 785 680 Q755 765 920 900 Z" fill="var(--or-hud-surface)" opacity="0.85" />
+      <path d="M716 900 Q704 765 655 675 Q628 610 720 535" fill="none" stroke="var(--or-yellow)" stroke-width="3" stroke-dasharray="12 10" opacity="0.75" />
+    </svg>
+
+    <div class="modal-shell main-menu-shell" role="dialog" aria-modal="true" aria-labelledby="menu-home-heading" tabindex="-1" data-menu-view="home">
+      <div class="menu-hero-header">
+        <div class="menu-header-top">
+          <div class="menu-brand"><div>
+            <h1 class="brand-logo-frame brand-logo-menu"><img src="grafika/marka-oskiride/oskiride-logo.png?v=2" alt="OskiRide" width="2103" height="748" /></h1>
+            <p>Ride beyond the room.</p>
+          </div></div>
+          <div class="menu-header-actions">
+            <nav class="menu-nav-pills" aria-label="Main menu navigation">
+              <button type="button" id="btn-tab-home" class="btn btn-secondary menu-tab-btn active" data-target-view="home" aria-current="page">Home</button>
+              <button type="button" id="btn-tab-play" class="btn btn-secondary menu-tab-btn" data-target-view="play">Ride</button>
+              <button type="button" id="btn-tab-workouts" class="btn btn-secondary menu-tab-btn" data-target-view="workouts">Workouts</button>
+              <button type="button" id="btn-tab-journal" class="btn btn-secondary menu-tab-btn" data-target-view="journal" aria-controls="menu-journal-section">Journal</button>
+              <button type="button" id="btn-tab-settings" class="btn btn-secondary menu-tab-btn" data-target-view="settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>Settings</button>
+            </nav>
+            <button id="btn-settings-close-top" class="btn-icon" aria-label="Close menu" title="Back to ride (Esc)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg></button>
+          </div>
+        </div>
+        <div class="menu-ble-actions">
+          <button type="button" id="btn-open-device-test" class="btn btn-secondary" aria-controls="menu-device-test-section">Device check</button>
+          <button id="btn-open-pairing" class="btn btn-secondary btn-devices-main" title="Open device connections"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label">Devices</span></button>
+          <button id="btn-ble-connect" class="btn btn-ble" title="Controllable trainer with FTMS, Tacx, or Wahoo support"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="ble-btn-label">FTMS trainer</span></button>
+          <button id="btn-power-connect" class="btn btn-secondary" title="BLE power meter (0x1818 — pedals, crank, spider)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="power-btn-label">BLE power</span></button>
+          <button id="btn-cadence-connect" class="btn btn-secondary" title="BLE speed and cadence sensor (0x1816)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg><span class="button-label" id="cadence-btn-label">BLE cadence</span></button>
+          <button id="btn-hrm-connect" class="btn btn-secondary" title="BLE heart rate monitor (0x180D)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart" /></svg><span class="button-label" id="hrm-btn-label">Heart rate monitor</span></button>
+          <button id="btn-zwift-connect" class="btn btn-secondary" title="Open Bluetooth controller settings" aria-controls="pairing-modal"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-controller" /></svg><span class="button-label" id="zwift-btn-label">Bluetooth controllers</span></button>
+        </div>
+        <div id="shifter-menu-hint" class="shifter-menu-hint" role="group" aria-label="Controller shortcuts" hidden>
+          <span id="shifter-navigate-hint" class="shifter-command" hidden>
+            <kbd class="shifter-key"><svg class="shifter-dpad" viewBox="0 0 24 24" role="img" aria-label="Left controller arrows"><use href="#icon-shifter-dpad" /></svg></kbd>
+            Navigate
+          </span>
+          <span id="shifter-confirm-hint" class="shifter-command" hidden>
+            <kbd class="shifter-key" data-shifter-button="b">B</kbd> Select
+          </span>
+          <span id="shifter-close-hint" class="shifter-command" hidden>
+            <kbd class="shifter-key"></kbd> Close
+          </span>
+        </div>
+      </div>
+
+      <!-- Widok 1: Ekran startowy z dwoma głównymi przyciskami: Graj oraz Ustawienia -->
+      <section id="ride-recovery-panel" class="ride-recovery-panel" aria-label="Interrupted ride" hidden>
+        <div><strong>Interrupted ride</strong><p id="ride-recovery-description"></p></div>
+        <div class="recovery-actions"><button id="btn-restore-ride" class="btn btn-primary" type="button">Restore</button><button id="btn-discard-ride" class="btn btn-secondary" type="button">Discard saved ride</button></div>
+      </section>
+      <p id="ride-storage-status" class="session-message" role="status" hidden></p>
+      <section id="menu-home-section" class="menu-section home-launcher-section" aria-labelledby="menu-home-heading">
+        <div class="home-launcher-banner">
+          <div class="home-launcher-copy">
+            <h2 id="menu-home-heading">Ready to ride?</h2>
+            <p>Choose a route or import a GPX file. Set up your rider and trainer before you start.</p>
+          </div>
+          <div class="home-primary-split">
+            <button type="button" id="btn-home-play" class="home-action-btn home-action-play">
+              <span class="home-action-head">
+                <strong>Ride</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow" /></svg>
+              </span>
+              <span class="home-action-sub">Choose a route, import GPX, and start riding</span>
+            </button>
+            <button type="button" id="btn-home-settings" class="home-action-btn home-action-settings">
+              <span class="home-action-head">
+                <strong>Settings</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>
+              </span>
+              <span class="home-action-sub">Rider profile, FTP, trainer, and graphics</span>
+            </button>
+            <button type="button" id="btn-home-devices" class="home-action-btn home-action-devices" style="grid-column: 1 / -1; margin-top: 8px;">
+              <span class="home-action-head">
+                <strong>Devices and trainer</strong>
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg>
+              </span>
+              <span class="home-action-sub" id="home-devices-status">Smart trainer, power meter, zPower profiles, and spindown calibration</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Widok 2: Wybór trasy i start (Graj) -->
+      <section id="menu-play-section" class="menu-section route-section hidden" aria-labelledby="menu-heading">
+        <div class="menu-section-header"><div><h2 id="menu-heading">Choose a route</h2><p class="section-description">Built-in routes and your own GPX files.</p></div><span id="active-route-pill" class="active-route-pill">Alpine Pass (5.2 km)</span></div>
+        <div class="route-cards-grid"><button type="button" class="route-card active" data-preset="mountain" id="card-route-mountain" aria-pressed="true">
+  <span class="route-card-top"><span class="route-category">Mountain</span><span class="route-distance">5.2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 41L28 39L48 31L67 34L91 17L110 23L132 5L151 13L175 35L198 39" /></svg>
+  <span class="route-card-title">Alpine Pass</span>
+  <span class="route-card-desc">KOM climb and fast descent</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Selected route</span></span>
+</button>
+<button type="button" class="route-card" data-preset="alpedhuez" id="card-route-alpedhuez" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Tour de France climb (HC)</span><span class="route-distance">13.9 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 42L16 40L30 35L44 32L60 26L76 23L92 18L110 15L128 11L146 8L164 5L182 4L198 3" /></svg>
+  <span class="route-card-title">Alpe d'Huez</span>
+  <span class="route-card-desc">21 bends · based on GPX data</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Choose a route</span></span>
+</button>
+<button type="button" class="route-card" data-preset="switchbacks" id="card-route-switchbacks" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Technical</span><span class="route-distance">7.5 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 39L24 39L42 16L61 27L83 9L100 20L121 5L143 21L160 17L180 35L198 33" /></svg>
+  <span class="route-card-title">Winding Switchbacks</span>
+  <span class="route-card-desc">Sharp turns and two climbs</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Choose a route</span></span>
+</button>
+<button type="button" class="route-card" data-preset="rolling" id="card-route-rolling" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Rolling</span><span class="route-distance">5.2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 34L24 18L45 33L67 12L91 30L116 15L140 31L164 11L183 29L198 24" /></svg>
+  <span class="route-card-title">Interval Valley</span>
+  <span class="route-card-desc">Short climbs for interval training</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Choose a route</span></span>
+</button>
+<button type="button" class="route-card" data-preset="flat" id="card-route-flat" aria-pressed="false">
+  <span class="route-card-top"><span class="route-category">Flat</span><span class="route-distance">5.2 km</span></span>
+  <svg class="route-line" viewBox="0 0 200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M2 31L29 30L52 28L76 30L102 26L124 27L150 24L173 28L198 27" /></svg>
+  <span class="route-card-title">Flat Time Trial</span>
+  <span class="route-card-desc">Steady pace and group riding</span>
+  <span class="route-selection"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check" /></svg><span>Choose a route</span></span>
+</button></div>
+        <div class="route-card route-card-gpx" id="card-route-gpx">
+          <div class="upload-route-copy"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upload" /></svg><div><strong>Have your own route?</strong><p id="gpx-card-filename" role="status">Choose a GPX file or drag it into the window.</p></div></div>
+          <label for="gpx-input" class="btn btn-secondary route-upload-btn" tabindex="0" role="button">Import GPX</label>
+        </div>
+        <section class="route-library" aria-labelledby="route-library-heading">
+          <div class="route-library-heading"><div><h3 id="route-library-heading">My GPX routes</h3><p id="route-library-count">Saved routes: 0</p></div><button type="button" id="btn-library-save-current" class="btn btn-secondary" disabled>Save current route</button></div>
+          <p id="route-library-status" role="status">Import a valid GPX file to add it to your library.</p>
+          <div class="route-library-tools"><label for="route-library-search">Search routes<input id="route-library-search" type="search" placeholder="Route name" autocomplete="off" /></label><label class="route-library-check"><input id="route-library-favorites" type="checkbox" />Favorites only</label><button type="button" id="btn-library-refresh" class="btn btn-secondary">Refresh</button></div>
+          <p id="route-library-lock" hidden>Finish your ride or reset resistance after the test to switch saved routes.</p>
+          <ul id="route-library-list" aria-label="Saved GPX routes"></ul>
+        </section>
+        <div class="start-offset-bar">
+          <div class="start-offset-info">
+            <label for="start-km-slider">Start location <strong id="start-km-label">0.0 km (route start)</strong></label>
+            <small id="menu-route-stats">5.2 km, 1 climb</small>
+          </div>
+          <div class="menu-profile-preview-wrap" title="Click the profile to set your start location">
+            <canvas id="menu-elevation-canvas" width="960" height="74" aria-label="Elevation preview for the selected route"></canvas>
+          </div>
+          <input type="range" id="start-km-slider" name="start-km-slider" min="0" max="5.2" value="0" step="0.1" />
+        </div>
+      </section>
+
+      <!-- Widok 3: Treningi ustrukturyzowane (.ZWO / .MRC / ERG) -->
+      <section id="menu-workouts-section" class="menu-section workouts-section hidden" aria-labelledby="workouts-heading">
+        <div class="menu-section-header">
+          <div>
+            <h2 id="workouts-heading">Structured workouts (ERG)</h2>
+            <p class="section-description">Choose a workout or import a ZWO, MRC, or ERG file.</p>
+          </div>
+          <div class="workout-actions-header">
+            <button type="button" id="btn-import-workout" class="btn btn-secondary" title="Choose a ZWO, MRC, or ERG file">
+              <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-upload" /></svg>Import workout
+            </button>
+            <input type="file" id="workout-file-input" name="workout-file-input" accept=".zwo,.mrc,.erg,.txt,.xml" hidden />
+          </div>
+        </div>
+
+        <div class="workout-presets-grid" id="workout-presets-container">
+          <!-- Wstrzykiwane dynamicznie z WORKOUT_PRESETS -->
+        </div>
+        <p id="workout-import-status" class="workout-import-status" role="status" aria-live="polite" hidden></p>
+
+        <div class="workout-active-panel">
+          <div class="workout-active-info">
+            <span class="workout-active-label">Selected workout:</span>
+            <strong id="workout-active-title">Sweet Spot 2×15 min</strong>
+            <span id="workout-active-meta" class="workout-active-meta">Duration: 50 min · 5 blocks · OskiRide Performance</span>
+          </div>
+          <div class="workout-active-controls">
+            <label class="workout-erg-toggle" title="Hold the selected power using trainer resistance (FTMS opcode 0x05)">
+              <input type="checkbox" id="workout-erg-toggle" name="workout-erg-toggle" checked />
+              <span>ERG mode (holds target power)</span>
+            </label>
+            <button type="button" id="btn-workout-toggle" class="btn btn-primary">
+              Start workout
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Widok 4: Odseparowane Ustawienia jazdy -->
+      <section id="menu-settings-section" class="menu-section setup-section hidden" aria-labelledby="setup-heading">
+        <div class="menu-section-header"><h2 id="setup-heading">Ride settings</h2><small>Set up your profile before starting. Graphics and resistance can be adjusted during a ride.</small></div>
+        <div class="settings-logs-entry"><div><strong>Ride diagnostics</strong><p>Each ride has its own log of device connections, errors, and performance.</p></div><button type="button" id="btn-open-logs" class="btn btn-secondary" aria-controls="menu-logs-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg>Logs</button></div>
+        <div class="settings-grid">
+          <fieldset class="settings-group"><legend>Rider profile and equipment</legend>
+            <a id="rider-model-studio" class="btn btn-secondary" href="grafika/index.html">Compare rider models</a>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="rider-name">Name or nickname</label><input type="text" id="rider-name" name="rider-name" autocomplete="nickname" maxlength="40" value="OskiRide" /></div>
+              <div class="setting-row"><label for="rider-ftp">FTP <span class="field-unit">W</span></label><input type="number" id="rider-ftp" name="rider-ftp" autocomplete="off" min="80" max="550" value="250" title="Threshold power used for power zones" /></div>
+              <div class="setting-row"><label for="rider-weight">Body weight <span class="field-unit">kg</span></label><input type="number" id="rider-weight" name="rider-weight" autocomplete="off" min="35" max="180" step="0.1" value="75" /></div>
+            </div>
+            <div class="setting-row"><label for="bike-type-select">Bike</label><select id="bike-type-select" name="bike-type-select" class="select-input"><option value="aero" selected>Aero road bike (7.5 kg)</option><option value="tt">Time trial bike (8.2 kg)</option><option value="mtb">MTB / gravel (10.2 kg)</option></select></div>
+            <p id="profile-save-status" class="session-message" role="status">Profile changes are saved automatically.</p>
+            <div class="setting-row"><label for="jersey-color-select">Jersey</label><select id="jersey-color-select" name="jersey-color-select" class="select-input"><option value="#f97316" selected>Orange</option><option value="#facc15">Yellow</option><option value="#ef4444">Red</option><option value="#06b6d4">Light blue</option><option value="#22c55e">Green</option></select></div>
+            <div class="setting-row"><label for="gearing-profile-select">Gear ratios</label><select id="gearing-profile-select" name="gearing-profile-select" class="select-input"><option value="allaround" selected>All-round road (50/34, 11–34)</option><option value="climbing">Climbing (46/30, 11–36)</option><option value="flat">Flat / TT (53/39, 11–25)</option></select></div>
+            <div class="setting-row"><label for="virtual-shifting-select">Virtual shifting</label><select id="virtual-shifting-select" name="virtual-shifting-select" class="select-input"><option value="auto" selected>Auto (Zwift Click)</option><option value="always">Always on (Cog / keyboard)</option><option value="off">Off (physical cassette)</option></select></div>
+          </fieldset>
+          <fieldset class="settings-group"><legend>Trainer and resistance</legend>
+            <div class="setting-row"><label for="trainer-mode-select">Resistance mode</label><select id="trainer-mode-select" name="trainer-mode-select" class="select-input"><option value="sim" selected>SIM (follows grade)</option><option value="erg">ERG (holds power)</option></select></div>
+            <div class="setting-row"><label for="trainer-diff">Trainer difficulty <strong id="trainer-diff-label">100%</strong></label><input type="range" id="trainer-diff" name="trainer-diff" min="0" max="100" value="100" step="10" title="How strongly route grade affects trainer resistance" /></div>
+            <div class="setting-row"><label for="downhill-clamp-select">Downhill resistance</label><select id="downhill-clamp-select" name="downhill-clamp-select" class="select-input"><option value="-1.5" selected>Comfort (min. −1.5% grade)</option><option value="0.0">Flat (min. 0% grade)</option><option value="-15.0">Full descent (down to −15%)</option></select></div>
+            <div class="setting-row"><label for="erg-softstart-select">ERG interval transition</label><select id="erg-softstart-select" name="erg-softstart-select" class="select-input"><option value="3" selected>Gradual (3 s ramp)</option><option value="0">Instant</option></select></div>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="power-smoothing-select">Power smoothing</label><select id="power-smoothing-select" name="power-smoothing-select" class="select-input"><option value="1">1 s (instant)</option><option value="3" selected>3 s (recommended)</option><option value="5">5 s (steady)</option></select></div>
+              <div class="setting-row"><label for="trainer-responsiveness-select">Resistance response</label><select id="trainer-responsiveness-select" name="trainer-responsiveness-select" class="select-input"><option value="smooth">Smooth (1.2%/s)</option><option value="standard" selected>Balanced (2%/s)</option><option value="dynamic">Fast (3.8%/s)</option></select></div>
+            </div>
+            <div class="setting-row" style="margin-top: var(--space-xs);"><button type="button" id="btn-ble-universal" class="btn btn-secondary" style="width: 100%; font-size: 12px; padding: 6px 10px;" title="Search all Bluetooth LE devices"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-link" /></svg>Search for any Bluetooth trainer</button></div>
+          </fieldset>
+          <fieldset class="settings-group"><legend>Graphics, ghosts and zPower</legend>
+            <div class="settings-pair">
+              <div class="setting-row"><label for="time-select">Time of day</label><select id="time-select" name="time-select" class="select-input"><option value="day" selected>Day</option><option value="dynamic">Day to sunset</option><option value="sunset">Sunset</option><option value="night">Night</option></select></div>
+              <div class="setting-row"><label for="quality-select">Graphics quality</label><select id="quality-select" name="quality-select" class="select-input"><option value="eco">Low</option><option value="medium" selected>Standard</option><option value="ultra">High</option></select></div>
+            </div>
+            <div class="setting-row"><label for="weather-select">Weather and road surface</label><select id="weather-select" name="weather-select" class="select-input"><option value="clear" selected>Sunny (dry road)</option><option value="wet">After rain (wet, reflective road)</option><option value="rain">Rain (wet road)</option><option value="snow">Alpine snowfall</option></select></div>
+            <label class="adaptive-graphics-toggle"><input type="checkbox" id="adaptive-graphics-toggle" checked />Adjust scenery and shadows automatically</label><p id="adaptive-graphics-status" class="adaptive-graphics-status" role="status">Automatic graphics adjustment is on.</p>
+            <label class="adaptive-graphics-toggle"><input type="checkbox" id="crowd-audio-toggle" checked />Alpe d’Huez crowd audio</label>
+            <div class="setting-row"><label for="crowd-audio-volume">Crowd volume <strong id="crowd-audio-volume-label">45%</strong></label><input type="range" id="crowd-audio-volume" min="0" max="100" value="45" step="5" /></div>
+            <p id="crowd-audio-status" class="adaptive-graphics-status" role="status">Crowd audio plays near bend 7 during the ride.</p>
+            <div class="setting-row"><label for="fov-slider">Field of view <strong id="fov-label">62°</strong></label><input type="range" id="fov-slider" name="fov-slider" min="52" max="85" value="62" step="1" /></div>
+            <div class="setting-row"><label for="clean-hud-select">Ride panel</label><select id="clean-hud-select" name="clean-hud-select" class="select-input"><option value="full" selected>Controls and charts</option><option value="minimal">Charts only</option></select></div>
+            <div class="setting-row"><label for="ghost-mode-select">Virtual ghost</label><select id="ghost-mode-select" name="ghost-mode-select" class="select-input"><option value="gpx" selected>GPX / default pace</option><option value="ftp">100% FTP (threshold)</option><option value="tempo">85% FTP (tempo)</option><option value="off">Off</option></select></div>
+            <label class="adaptive-graphics-toggle"><input type="checkbox" id="record-ghost-toggle" name="record-ghost-toggle" checked />Second ghost: personal best</label>
+            <div class="setting-row" id="record-ghost-select-row"><label for="record-ghost-select">Ride for second ghost</label><select id="record-ghost-select" name="record-ghost-select" class="select-input" aria-describedby="record-ghost-status"><option value="best" selected>Fastest time (route record)</option></select></div>
+            <p id="record-ghost-status" class="adaptive-graphics-status" role="status">No saved ride on this route. Save a ride to race your personal best.</p>
+            <div class="setting-row"><label for="virtual-power-curve-select">zPower curve (classic trainer)</label><select id="virtual-power-curve-select" name="virtual-power-curve-select" class="select-input"><option value="fluid" selected>Fluid trainer (Kinetic, Elite)</option><option value="magnetic">Magnetic trainer (level 3)</option><option value="rollers">Rollers</option><option value="spinbike">Stationary / spin bike</option></select></div>
+          </fieldset>
+          <select id="preset-select" name="preset-select" class="hidden" aria-label="Built-in route"><option value="mountain" selected>mountain</option><option value="alpedhuez">alpedhuez</option><option value="switchbacks">switchbacks</option><option value="rolling">rolling</option><option value="flat">flat</option></select>
+        </div>
+      </section>
+
+      <section id="menu-journal-section" class="menu-section ride-journal hidden" aria-labelledby="journal-heading">
+        <div class="journal-heading">
+          <h2 id="journal-heading" tabindex="-1">Ride journal</h2>
+          <p id="journal-status" role="status">Loading saved rides…</p>
+          <button id="btn-journal-retry" class="btn btn-secondary" type="button" hidden>Refresh journal</button>
+        </div>
+        <div id="journal-content" hidden>
+          <div class="journal-filters">
+            <label for="journal-route">Route<select id="journal-route" class="select-input"><option value="">All routes</option></select></label>
+            <label for="journal-range">Date range<select id="journal-range" class="select-input"><option value="all">All time</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="year">This year</option></select></label>
+          </div>
+          <dl class="journal-totals" aria-label="Selected ride summary">
+            <div><dt>Rides</dt><dd id="journal-count">0</dd></div>
+            <div><dt>Distance</dt><dd id="journal-distance">0 km</dd></div>
+            <div><dt>Ride time</dt><dd id="journal-duration">0 min</dd></div>
+            <div><dt>Elevation gain</dt><dd id="journal-ascent">0 m</dd></div>
+          </dl>
+          <div class="journal-workspace">
+            <section class="journal-rides" aria-labelledby="journal-rides-heading">
+              <h3 id="journal-rides-heading" tabindex="-1">Ride history</h3>
+              <div id="journal-selection" class="journal-selection">
+                <p id="journal-selection-status" role="status">Select two rides to compare.</p>
+                <ol id="journal-selected-rides" aria-label="Rides selected for comparison" hidden></ol>
+                <div class="journal-actions" id="journal-selection-actions" hidden>
+                  <button id="btn-journal-compare" class="btn btn-primary" type="button" disabled>Compare rides</button>
+                  <button id="btn-journal-clear" class="btn btn-secondary" type="button">Clear selection</button>
+                </div>
+              </div>
+              <ul id="ride-history-list" class="journal-ride-list" aria-label="Saved rides"></ul>
+              <p id="journal-empty" class="journal-note" hidden></p>
+              <button id="btn-journal-choose-route" class="btn btn-secondary" type="button" hidden>Choose a route</button>
+              <button id="btn-journal-reset-filters" class="btn btn-secondary" type="button" hidden>Show all rides</button>
+              <div id="journal-pagination" class="journal-pagination" hidden>
+                <button id="btn-journal-prev" class="btn btn-secondary" type="button">Previous</button>
+                <span id="journal-page" role="status"></span>
+                <button id="btn-journal-next" class="btn btn-secondary" type="button">Next</button>
+              </div>
+            </section>
+            <section class="journal-trend" aria-labelledby="journal-trend-heading">
+              <h3 id="journal-trend-heading">Progress over time</h3>
+              <div class="journal-chart-controls">
+                <label for="journal-trend-metric">Metric<select id="journal-trend-metric" class="select-input"><option value="distance">Distance</option><option value="duration">Ride time</option><option value="ascent">Elevation gain</option><option value="m5">Best 5-minute power</option><option value="m20">Best 20-minute power</option></select></label>
+                <label for="journal-grouping">Group by<select id="journal-grouping" class="select-input"><option value="week">Week</option><option value="month">Month</option></select></label>
+              </div>
+              <canvas id="journal-trend-chart" class="journal-plot" role="img" aria-label="Progress chart"></canvas>
+              <p id="journal-trend-note" class="journal-note" hidden></p>
+              <details id="journal-trend-details" class="journal-trend-details" hidden>
+                <summary>Chart data</summary>
+                <div class="journal-table-scroll" role="region" aria-label="Results by period" tabindex="0">
+                  <table class="journal-table"><thead><tr><th scope="col" id="journal-period-column">Week starting</th><th scope="col" id="journal-trend-column">Distance</th></tr></thead><tbody id="journal-trend-values"></tbody></table>
+                </div>
+              </details>
+            </section>
+          </div>
+          <p id="journal-legacy-note" class="journal-note" hidden>Older rides are matched by route name. Rides with an ambiguous name stay under “Older rides.” Distances in older records are approximate.</p>
+          <section id="journal-comparison" class="journal-comparison" aria-labelledby="journal-comparison-heading" hidden>
+            <div class="journal-comparison-header"><h3 id="journal-comparison-heading" tabindex="-1">Ride comparison</h3><button id="btn-journal-back-to-rides" class="btn btn-secondary" type="button">Back to ride history</button></div>
+            <p id="journal-comparison-note" class="journal-note" role="status"></p>
+            <div id="journal-comparison-content" hidden>
+              <div id="journal-comparison-legend" class="journal-legend"></div>
+              <div class="journal-chart-controls journal-comparison-controls">
+                <label for="journal-compare-metric">Chart metric<select id="journal-compare-metric" class="select-input"><option value="watts">Power</option><option value="hr">Heart rate</option><option value="cadence">Cadence</option><option value="speedMps">Speed</option><option value="ele">Elevation</option></select></label>
+                <label for="journal-compare-axis">Horizontal axis<select id="journal-compare-axis" class="select-input"><option value="time">Ride time</option><option value="distance">Distance ridden</option><option value="route" disabled>Route distance</option></select></label>
+              </div>
+              <canvas id="journal-comparison-chart" class="journal-plot journal-compare-plot" role="img" aria-label="Ride comparison chart"></canvas>
+              <p id="journal-comparison-chart-note" class="journal-note" hidden></p>
+              <div class="journal-table-scroll" role="region" aria-label="Differences between rides" tabindex="0">
+                <table class="journal-table journal-compare-table"><thead><tr><th scope="col">Metric</th><th scope="col">A</th><th scope="col">B</th><th scope="col">B − A</th></tr></thead><tbody id="journal-comparison-values"></tbody></table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="menu-device-test-section" class="menu-section hidden" aria-labelledby="device-check-heading">
+        <div class="device-check-heading"><div><h2 id="device-check-heading" tabindex="-1">Pre-ride device check</h2><p id="device-check-trainer">Trainer disconnected</p></div><button type="button" id="btn-device-test-back" class="btn btn-secondary">Back to menu</button></div>
+        <p id="device-check-availability">The test adds no ride time or distance.</p>
+        <div class="device-check-actions"><button type="button" id="btn-device-test-pair" class="btn btn-secondary">Connect devices</button><button type="button" id="btn-check-readings" class="btn btn-primary">Check readings (30 s)</button><button type="button" id="btn-check-stop" class="btn btn-secondary" disabled>Stop test</button></div>
+        <p id="device-check-reading-status" role="status">Connect your devices, then start the readings check.</p>
+        <progress id="device-check-progress" value="0" max="30" aria-label="Readings check progress"></progress>
+        <dl class="device-check-signals">
+          <div id="device-check-power"><dt>Power</dt><dd><strong id="device-check-power-value">—</strong><span id="device-check-power-status">Test not run</span></dd></div>
+          <div id="device-check-cadence"><dt>Cadence</dt><dd><strong id="device-check-cadence-value">—</strong><span id="device-check-cadence-status">Test not run</span></dd></div>
+          <div id="device-check-heart"><dt>Heart rate</dt><dd><strong id="device-check-heart-value">—</strong><span id="device-check-heart-status">Test not run</span></dd></div>
+        </dl>
+        <div class="device-check-resistance"><h3>Resistance response</h3><p id="device-check-resistance-status" role="status">Connect a controllable trainer to test resistance.</p><button type="button" id="btn-check-resistance" class="btn btn-secondary" disabled>Test resistance (5 s)</button><button type="button" id="btn-check-neutral" class="btn btn-secondary" hidden>Reset resistance</button><div id="device-check-confirmation" class="device-check-actions" hidden><button type="button" id="btn-check-resistance-yes" class="btn btn-primary">Yes, resistance changed</button><button type="button" id="btn-check-resistance-no" class="btn btn-secondary">No change</button></div></div>
+      </section>
+
+      <section id="menu-logs-section" class="menu-section hidden" aria-labelledby="ride-logs-heading">
+        <div class="ride-logs-heading"><div><h2 id="ride-logs-heading" tabindex="-1">Ride logs</h2><p id="ride-log-count">Saved rides: 0</p></div><button type="button" id="btn-logs-back" class="btn btn-secondary">Back to settings</button></div>
+        <p id="ride-log-status" class="ride-log-status" role="status">Logs are stored on this device.</p>
+        <div class="ride-log-actions"><button type="button" id="btn-log-refresh" class="btn btn-secondary">Refresh</button><button type="button" id="btn-log-export" class="btn btn-secondary" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>Download ride logs</button></div>
+        <div class="ride-log-layout"><nav id="ride-log-list" aria-label="Rides with logs"></nav><article id="ride-log-detail" aria-label="Logs for selected ride"></article></div>
+      </section>
+
+      <section class="session-preflight" aria-label="Ride setup">
+        <p id="session-ready-status" role="status">Ride setup</p>
+        <dl class="session-facts"><div><dt>Route</dt><dd id="ready-route">Alpine Pass</dd></div><div><dt>Profile</dt><dd id="ready-profile">OskiRide · 250 W · 75 kg</dd></div><div><dt>Plan</dt><dd id="ready-workout">Free ride</dd></div></dl>
+        <details class="session-sources"><summary>Data sources and control</summary><dl class="session-facts"><div><dt>Power</dt><dd data-source-key="power">Keyboard simulation</dd></div><div><dt>Cadence</dt><dd data-source-key="cadence">Estimated</dd></div><div><dt>Heart rate</dt><dd data-source-key="heart">No heart rate monitor</dd></div><div><dt>Resistance</dt><dd data-source-key="control">No Bluetooth control</dd></div></dl></details>
+      </section>
+      <div class="menu-footer-actions">
+        <div class="menu-footer-secondary">
+          <button id="btn-restart-route" class="btn btn-secondary"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-restart" /></svg>Restart route</button>
+          <button id="btn-open-summary" class="btn btn-secondary" type="button">Ride summary</button>
+          <span class="keyboard-hint"><kbd>Esc</kbd> Back to ride</span>
+        </div>
+        <button id="btn-settings-close" class="btn btn-play-big">
+          <span class="button-label">Start ride</span>
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow" /></svg>
+          <kbd class="shifter-key shifter-start-key" data-shifter-button="b" aria-hidden="true" hidden>B</kbd>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finish & Ride Summary Modal -->
+  <div id="finish-modal" class="modal-backdrop hidden">
+    <div class="modal-shell summary-modal-shell" role="dialog" aria-modal="true" aria-labelledby="finish-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="finish-heading">Workout summary</h2>
+          <p id="finish-route-name" class="finish-subtitle">Alpine Pass</p>
+        </div>
+        <button id="btn-finish-close-top" class="btn-icon" aria-label="Close summary">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <div class="finish-stats-grid">
+        <div class="finish-stat">
+          <span>Ride time</span>
+          <strong id="finish-time">00:00</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Distance and elevation gain</span>
+          <strong id="finish-dist">0.00 km / 0 m</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Average power and energy</span>
+          <strong id="finish-watts">0 W (0.0 W/kg)</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Normalized power and training load</span>
+          <strong id="finish-np-tss">NP 0 W · IF 0.00 · TSS 0</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Efficiency (VI / EF)</span>
+          <strong id="finish-vi-ef">VI 1.00 · EF —</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Avg. / max. cadence and heart rate</span>
+          <strong id="finish-cadence-hr">0 / 0 rpm · — bpm</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Power profile</span>
+          <strong id="finish-phenotype">All-Rounder</strong>
+        </div>
+        <div class="finish-stat">
+          <span>Result against ghost</span>
+          <strong id="finish-ghost">—</strong>
+        </div>
+      </div>
+
+      <div class="summary-analytics-grid">
+        <section class="summary-panel" aria-labelledby="zones-heading">
+          <div class="summary-panel-header">
+            <h3 id="zones-heading">Time in Coggan power zones (Z1–Z7)</h3>
+            <small id="summary-ftp-label">Based on FTP of 250 W</small>
+          </div>
+          <div id="finish-zones-list" class="zones-bars-list"></div>
+        </section>
+
+        <section class="summary-panel" aria-labelledby="peaks-heading">
+          <div class="summary-panel-header">
+            <h3 id="peaks-heading">Power curve and MMP records</h3>
+            <small>Best average power by duration</small>
+          </div>
+          <div class="peaks-grid">
+            <div class="peak-box">
+              <span class="peak-duration">Pmax (peak sprint)</span>
+              <strong id="peak-max">0 W</strong>
+              <small id="peak-max-wkg">0.0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">5 seconds (sprint)</span>
+              <strong id="peak-5s">0 W</strong>
+              <small id="peak-5s-wkg">0.0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">15 seconds (attack)</span>
+              <strong id="peak-15s">0 W</strong>
+              <small id="peak-15s-wkg">0.0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">1 minute (anaerobic)</span>
+              <strong id="peak-1m">0 W</strong>
+              <small id="peak-1m-wkg">0.0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">5 minutes (VO₂max)</span>
+              <strong id="peak-5m">0 W</strong>
+              <small id="peak-5m-wkg">0.0 W/kg</small>
+            </div>
+            <div class="peak-box">
+              <span class="peak-duration">20 minutes (FTP threshold)</span>
+              <strong id="peak-20m">0 W</strong>
+              <small id="peak-20m-wkg">0.0 W/kg</small>
+            </div>
+          </div>
+          <div class="mmp-chart-container" style="margin-top: var(--space-xs);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:var(--text-xs); font-weight:600; color:var(--or-ink);">Power-duration curve (Pmax, 5 s–20 min)</span>
+              <span id="mmp-ftp-ref" style="font-size:var(--text-xs); color:var(--or-forest); font-weight:600;">FTP reference line</span>
+            </div>
+            <canvas id="finish-mmp-canvas" style="width:100%; height:110px; display:block; border-radius:6px; background:var(--or-sand); border:1px solid var(--or-border);" aria-label="Mean maximal power chart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <section class="summary-panel finish-nutrition-panel" aria-labelledby="nutrition-heading" style="margin-bottom: var(--space-md);">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="nutrition-heading">Energy balance and recovery</h3>
+            <small>Estimated fuel use and recovery guidance</small>
+          </div>
+          <span id="nutrition-total-energy" class="badge-tag" style="background: var(--or-tag-tech-bg); color: var(--or-tag-tech-ink); font-weight: 700; padding: 2px 8px; border-radius: 4px;">0 kcal / 0 kJ</span>
+        </div>
+        <div class="nutrition-grid">
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Carbohydrates (glycogen)</span>
+            <strong id="nutrition-carbs" class="nutrition-val">0 g</strong>
+            <small id="nutrition-carbs-kcal">0 kcal (~0%)</small>
+          </div>
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Fat used</span>
+            <strong id="nutrition-fat" class="nutrition-val">0 g</strong>
+            <small id="nutrition-fat-kcal">0 kcal (~0%)</small>
+          </div>
+          <div class="nutrition-card">
+            <span class="nutrition-card-label">Estimated hydration</span>
+            <strong id="nutrition-sweat" class="nutrition-val">0.0 L</strong>
+            <small>Fluid loss / sweat</small>
+          </div>
+          <div class="nutrition-card nutrition-tip-card">
+            <span class="nutrition-card-label">Recovery nutrition</span>
+            <p id="nutrition-tip-text" class="nutrition-tip-text">Replenish carbohydrates and electrolytes after exercise.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-panel finish-telemetry-panel" aria-labelledby="telemetry-chart-heading" style="margin-bottom: var(--space-md);">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="telemetry-chart-heading">Workout timeline (power, heart rate, and elevation)</h3>
+            <small>Recorded ride data</small>
+          </div>
+          <div class="chart-legend" style="display:flex; flex-wrap:wrap; gap:12px; font-size:var(--text-xs); color:var(--or-muted); align-items:center;">
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#F2C94C; display:inline-block;"></span>Power (W)</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#ef4444; display:inline-block;"></span>Heart rate (bpm)</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#38bdf8; display:inline-block;"></span>Speed</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#557347; display:inline-block;"></span>Elevation gain (m)</span>
+          </div>
+        </div>
+        <canvas id="finish-telemetry-canvas" width="810" height="150" style="width:100%; height:auto; display:block; border-radius:4px; background:var(--or-surface);" aria-label="Power and heart rate chart"></canvas>
+      </section>
+
+      <section class="summary-panel history-panel" aria-labelledby="history-heading">
+        <div class="summary-panel-header">
+          <div>
+            <h3 id="history-heading">Ride journal</h3>
+            <small id="history-status-label" role="status">Completed rides are saved automatically.</small>
+          </div>
+          <div class="journal-actions">
+            <button id="btn-save-ride-history" class="btn btn-secondary" type="button">Save current ride</button>
+            <button id="btn-remove-journal-ride" class="btn btn-secondary" type="button" hidden>Delete ride</button>
+            <button id="btn-open-journal" class="btn btn-secondary" type="button">Open journal</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="finish-actions">
+        <button id="btn-finish-fit" class="btn btn-primary" title="Download a FIT file with power, heart rate, cadence, and GPS">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>
+          Download FIT
+        </button>
+        <button id="btn-finish-tcx" class="btn btn-secondary" title="Download a TCX activity file (XML)">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-download" /></svg>
+          Download TCX
+        </button>
+        <button id="btn-finish-strava" class="btn btn-strava" type="button" title="Open the Strava activity upload page">
+          Open Strava ↗
+        </button>
+        <button id="btn-finish-close" class="btn btn-secondary">Back to menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ekran wyboru urządzeń w stylu Zwift (Device Pairing Modal) -->
+  <div id="pairing-modal" class="modal-backdrop hidden">
+    <div class="modal-shell pairing-modal-shell" role="dialog" aria-modal="true" aria-labelledby="pairing-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="pairing-heading" tabindex="-1">Paired devices</h2>
+          <p class="finish-subtitle">Connect your trainer, sensors, and controllers.</p>
+        </div>
+        <button id="btn-pairing-close-top" class="btn-icon" aria-label="Close pairing">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <!-- Pasek Realizmu Fizyki -->
+      <div id="pairing-realism-banner" class="realism-banner realism-muted" aria-live="polite">
+        <div class="realism-banner-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bolt" /></svg></div>
+        <div class="realism-banner-info">
+          <strong id="pairing-realism-title">Power source: Keyboard simulation</strong>
+          <p id="pairing-realism-desc">Connect a smart trainer or a speed sensor with a zPower profile.</p>
+        </div>
+        <span id="pairing-realism-pill" class="realism-pill">Keyboard</span>
+      </div>
+
+      <section class="shifter-panel" id="shifter-panel" aria-labelledby="shifter-heading">
+        <div class="shifter-heading">
+          <div><h3 id="shifter-heading" tabindex="-1">Bluetooth controllers</h3><p id="shifter-status" role="status">Connect a controller directly to OskiRide.</p></div>
+          <p class="shifter-gear">Gear <strong id="shifter-gear">12 / 24</strong></p>
+        </div>
+        <div class="shifter-controls">
+          <label for="shifter-model">Controller model
+            <select id="shifter-model" class="select-input" aria-describedby="shifter-model-help">
+              <option value="click-v2">Zwift Click V2 · Right (+)</option>
+              <option value="click-v2-left">Zwift Click V2 · Left (−)</option>
+              <option value="click-v1">Zwift Click V1</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-primary" id="btn-shifter-connect">Connect controller</button>
+          <button type="button" class="btn btn-secondary" id="btn-shifter-disconnect" hidden>Disconnect controllers</button>
+        </div>
+        <p class="shifter-help" id="shifter-model-help">Press + to wake the right controller and connect it. To use −, select and connect the left controller as well.</p>
+        <ul class="shifter-devices" id="shifter-devices" aria-label="Bluetooth controllers" hidden></ul>
+        <details class="shifter-settings" id="shifter-settings">
+          <summary>Button mapping and test</summary>
+          <p class="shifter-help" id="shifter-menu-note" hidden>Use the left Click V2 arrows to highlight an option and <kbd>B</kbd> to confirm it.</p>
+          <div class="shifter-map" id="shifter-map"></div>
+          <div class="shifter-actions">
+            <button type="button" class="btn btn-secondary" id="btn-shifter-test" aria-controls="shifter-test-panel" aria-pressed="false">Test buttons</button>
+            <button type="button" class="btn btn-secondary" id="btn-shifter-reset">Restore defaults</button>
+          </div>
+          <div class="shifter-test-panel" id="shifter-test-panel" hidden>
+            <p class="shifter-test-status" id="shifter-test-status" role="status"></p>
+            <div class="shifter-test-diagrams" id="shifter-test-diagrams"></div>
+          </div>
+          <p class="shifter-help" id="shifter-storage-status" role="status" hidden></p>
+        </details>
+      </section>
+
+      <!-- Kafelki 4 urządzeń (Zwift Style Grid) -->
+      <div class="pairing-grid">
+        <!-- 1. Trenażer Smart / Kontrola oporu -->
+        <div class="device-card" id="card-dev-trainer">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trainer" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Resistance and grade</span>
+              <strong class="device-title">Smart trainer</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-trainer">Disconnected</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-trainer">No active trainer</div>
+            <div class="device-conn-sub" id="sub-dev-trainer">FTMS · Tacx FE-C · Wahoo Direct</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-trainer" class="btn btn-secondary btn-pair">Find trainer</button>
+            <button type="button" id="btn-spindown-open" class="btn btn-secondary btn-spindown" title="Flywheel spindown calibration">
+              <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings" /></svg> Calibrate
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Pomiar mocy (Watty) -->
+        <div class="device-card" id="card-dev-power">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bolt" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Direct measurement</span>
+              <strong class="device-title">Power meter</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-power">Disconnected</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-power">No power meter</div>
+            <div class="device-conn-sub" id="sub-dev-power">Pedals (Assioma, Rally) · Crank (Stages, 4iiii, Quarq)</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-power" class="btn btn-secondary btn-pair">Find power meter</button>
+          </div>
+        </div>
+
+        <!-- 3. Prędkość i Kadencja / zPower dla trenażerów klasycznych -->
+        <div class="device-card" id="card-dev-speed">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speed" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Classic trainer / sensor</span>
+              <strong class="device-title">Speed and zPower</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-speed">Disconnected</span>
+          </div>
+          <div class="device-card-body">
+            <label for="pairing-zpower-select" class="device-field-label">Trainer model (zPower curve):</label>
+            <select id="pairing-zpower-select" name="pairing-zpower-select" class="select-input zpower-select">
+              <option value="none">No zPower profile</option>
+              <optgroup label="Tacx">
+                <option value="tacx_blue_matic">Tacx Blue Matic (lever: position 3)</option>
+                <option value="tacx_blue_motion">Tacx Blue Motion (lever: position 4)</option>
+                <option value="tacx_booster">Tacx Booster (lever: position 3)</option>
+                <option value="tacx_satori">Tacx Satori Pro (lever: position 3)</option>
+              </optgroup>
+              <optgroup label="Elite">
+                <option value="elite_novo_force">Elite Novo Force (lever: position 3)</option>
+                <option value="elite_qubo_mag">Elite Qubo Power Mag (lever: position 3)</option>
+                <option value="elite_qubo_fluid">Elite Qubo Fluid (fluid)</option>
+              </optgroup>
+              <optgroup label="Kurt Kinetic">
+                <option value="kinetic_road_machine">Kurt Kinetic Road Machine (fluid)</option>
+                <option value="kinetic_rock_roll">Kurt Kinetic Rock and Roll</option>
+              </optgroup>
+              <optgroup label="Decathlon / Van Rysel">
+                <option value="decathlon_inride_100">B'Twin / Van Rysel In'Ride 100 (lever: position 3)</option>
+                <option value="decathlon_inride_500">B'Twin / Van Rysel In'Ride 500 (fluid)</option>
+              </optgroup>
+              <optgroup label="Saris / CycleOps">
+                <option value="saris_fluid2">Saris / CycleOps Fluid2 (fluid)</option>
+                <option value="saris_mag">Saris / CycleOps Mag (lever: position 3)</option>
+              </optgroup>
+              <optgroup label="Minoura">
+                <option value="minoura_magride">Minoura MagRide 60/80 (lever: position 3)</option>
+              </optgroup>
+              <optgroup label="Uniwersalne">
+                <option value="fluid" selected>Generic fluid trainer</option>
+                <option value="magnetic">Generic magnetic trainer (level 3)</option>
+                <option value="rollers">Road rollers</option>
+                <option value="spinbike">Stationary / spin bike</option>
+              </optgroup>
+            </select>
+            <div class="device-setting-hint" id="pairing-zpower-hint">Hydraulic resistance rises with speed (v³).</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-speed" class="btn btn-secondary btn-pair">Find sensor</button>
+          </div>
+        </div>
+
+        <!-- 4. Pulsometr (Tętno) -->
+        <div class="device-card" id="card-dev-heart">
+          <div class="device-card-header">
+            <div class="device-card-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart" /></svg></div>
+            <div class="device-card-titles">
+              <span class="device-category">Biometrics</span>
+              <strong class="device-title">Heart rate monitor</strong>
+            </div>
+            <span class="device-status-badge" id="badge-dev-heart">Disconnected</span>
+          </div>
+          <div class="device-card-body">
+            <div class="device-conn-name" id="name-dev-heart">No heart rate monitor</div>
+            <div class="device-conn-sub" id="sub-dev-heart">BLE Heart Rate standard (Polar, Garmin, Wahoo, Magene)</div>
+            <div class="device-setting-hint" style="margin-top: 6px;">Bluetooth optical armband or chest strap</div>
+          </div>
+          <div class="device-card-actions">
+            <button type="button" id="btn-pair-heart" class="btn btn-secondary btn-pair">Find heart rate monitor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dolne akcje parowania -->
+      <div class="pairing-footer">
+        <button type="button" id="btn-pairing-universal" class="btn btn-secondary" title="Search for any Bluetooth device">
+          Search for all Bluetooth devices
+        </button>
+        <button type="button" id="btn-pairing-close" class="btn btn-play-big">
+          Done / Back to ride
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="shifter-picker" id="shifter-picker" aria-labelledby="shifter-picker-heading">
+    <h2 id="shifter-picker-heading">Choose a Bluetooth controller</h2>
+    <p id="shifter-picker-status" role="status">Searching for controllers. Press a button to wake yours.</p>
+    <label for="shifter-picker-device">Detected controller
+      <select class="select-input" id="shifter-picker-device" disabled><option value="">Select a controller</option></select>
+    </label>
+    <div class="shifter-actions">
+      <button type="button" class="btn btn-secondary" id="btn-shifter-picker-cancel" autofocus>Cancel</button>
+      <button type="button" class="btn btn-primary" id="btn-shifter-picker-connect" disabled>Connect</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Kalibracji Spindown (FTMS / Wybieg koła zamachowego) -->
+  <div id="spindown-modal" class="modal-backdrop hidden">
+    <div class="modal-shell spindown-modal-shell" role="dialog" aria-modal="true" aria-labelledby="spindown-heading">
+      <div class="summary-header">
+        <div>
+          <h2 id="spindown-heading">Trainer calibration (spindown)</h2>
+          <p class="finish-subtitle" id="spindown-subtitle">Calibrate trainer resistance for more accurate power readings.</p>
+        </div>
+        <button id="btn-spindown-close-top" class="btn-icon" aria-label="Close calibration">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+        </button>
+      </div>
+
+      <div class="spindown-content">
+        <!-- Faza 1: Przygotowanie -->
+        <div id="spindown-step-prep" class="spindown-step">
+          <div class="spindown-instruction-card">
+            <h3>Before you start</h3>
+            <ul>
+              <li><strong>Warm-up:</strong> Ride for about 8–10 minutes so the trainer reaches operating temperature.</li>
+              <li><strong>Tire (wheel-on trainers):</strong> Check tire pressure (7–8 bar) and roller tension.</li>
+              <li><strong>Calibration:</strong> Accelerate the trainer to <strong>37.0 km/h</strong>, then stop pedaling completely.</li>
+            </ul>
+          </div>
+          <button type="button" id="btn-spindown-start" class="btn btn-play-big" style="width: 100%; margin-top: var(--space-md);">
+            Start calibration
+          </button>
+        </div>
+
+        <!-- Faza 2 i 3: Rozpędzanie i wybieg (Spinup & Coastdown) -->
+        <div id="spindown-step-active" class="spindown-step hidden">
+          <div class="spindown-phase-title" id="spindown-phase-title">Accelerate to 37 km/h</div>
+          <div class="spindown-gauge-wrap">
+            <div class="spindown-speed-display">
+              <span id="spindown-current-speed">0,0</span> <small>km/h</small>
+            </div>
+            <div class="spindown-target-text">Target: 37.0 km/h</div>
+            <div class="spindown-bar-track">
+              <div id="spindown-bar-fill" class="spindown-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div id="spindown-prompt" class="spindown-prompt" aria-live="polite" aria-atomic="true">Pedal harder…</div>
+          <button type="button" id="btn-spindown-cancel" class="btn btn-secondary" style="width: 100%; margin-top: var(--space-md);">
+            Cancel calibration
+          </button>
+        </div>
+
+        <!-- Faza 4: Sukces -->
+        <div id="spindown-step-success" class="spindown-step hidden">
+          <div class="spindown-success-card">
+            <div class="success-icon">✓</div>
+            <h3>Calibration complete</h3>
+            <p>Trainer calibration finished. The resistance coefficient has been updated.</p>
+            <div class="spindown-result-stat">
+              <span>Measured spindown time:</span>
+              <strong id="spindown-measured-time">14.2 s</strong>
+            </div>
+          </div>
+          <button type="button" id="btn-spindown-finish" class="btn btn-play-big" style="width: 100%; margin-top: var(--space-md);">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js?v=20261116-zwift-click"></script>
+</body>
+</html>

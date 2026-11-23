@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OskiRide — Rider Studio</title>
+  <link rel="icon" type="image/png" href="marka-oskiride/oskiride-icon.png?v=2">
+  <link rel="stylesheet" href="studio.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head>
+<body>
+  <header class="masthead">
+    <a href="../index.html" class="brand" aria-label="OskiRide — Back to ride"><span class="brand-mark">O<span>↗</span></span>OSKI<span>RIDE</span></a>
+    <span class="eyebrow">RIDER STUDIO</span>
+    <a class="back-link" href="../index.html">Back to ride <span>↗</span></a>
+  </header>
+  <main>
+    <div class="intro">
+      <div><p class="eyebrow copper">FOUR RIDER MODELS</p><h1>One pedal stroke.<br><span>Four styles.</span></h1></div>
+      <div class="intro-right"><p>Choose your rider, kit, and bike finish.<br>All four models share the same riding animation.</p><a id="ride" class="primary" href="../index.html">Ride with this model <span>↗</span></a></div>
+    </div>
+    <section class="toolbar" aria-label="Shared preview controls">
+      <button id="pause" type="button" aria-pressed="false"><span id="pause-icon">Ⅱ</span> <span id="pause-label">Pause</span></button>
+      <span class="divider"></span>
+      <label class="cadence-label" for="cadence">Cadence <strong><output id="cadence-value">80</output> <small>rpm</small></strong><input id="cadence" type="range" min="0" max="120" value="80" step="1"></label>
+      <span class="divider"></span>
+      <label>Position <select id="pose"><option value="seated">Seated</option><option value="standing">Standing</option><option value="aero">Aero tuck</option></select></label>
+      <span class="divider"></span>
+      <div class="views" role="group" aria-label="Camera"><button data-view="three" class="active">¾</button><button data-view="side">Side</button><button data-view="rear">Rear</button><button data-view="front">Front</button></div>
+      <span id="load-status" role="status">Loading models…</span>
+    </section>
+    <section id="grid" class="grid" aria-label="Compare four rider models">
+      <canvas id="canvas" aria-label="Animated 3D preview of four riders"></canvas>
+      <article class="card" data-design="velocity">
+        <div class="card-top"><span class="number">01</span><span class="tag">SPORT</span><span class="chosen">SELECTED</span></div>
+        <div class="stage" role="img" aria-label="Velocity — copper kit and light-colored bike"></div>
+        <div class="card-bottom"><div><h2>Velocity<span class="swatches"><i style="--swatch:#ae4e35"></i><i style="--swatch:#20333c"></i><i style="--swatch:#e2d8c2"></i></span></h2><p>Sport road bike, copper kit, sand frame, and race helmet.</p></div><button class="choose" data-id="velocity">Select <span>↗</span></button></div>
+      </article>
+      <article class="card" data-design="alpine">
+        <div class="card-top"><span class="number">02</span><span class="tag">CLIMB</span><span class="chosen">SELECTED</span></div>
+        <div class="stage" role="img" aria-label="Alpine — green kit, light frame, and vented helmet"></div>
+        <div class="card-bottom"><div><h2>Alpine<span class="swatches"><i style="--swatch:#416c57"></i><i style="--swatch:#dce9af"></i><i style="--swatch:#192f2c"></i></span></h2><p>Sage kit, diagonal panel, and lightweight climbing wheels.</p></div><button class="choose" data-id="alpine">Select <span>↗</span></button></div>
+      </article>
+      <article class="card" data-design="nocturne">
+        <div class="card-top"><span class="number">03</span><span class="tag">AERO</span><span class="chosen">SELECTED</span></div>
+        <div class="stage" role="img" aria-label="Nocturne — navy aero rider with gold accents"></div>
+        <div class="card-bottom"><div><h2>Nocturne<span class="swatches"><i style="--swatch:#263d54"></i><i style="--swatch:#c5a167"></i><i style="--swatch:#101c2a"></i></span></h2><p>Graphite aero bike, gold accents, and carbon wheels.</p></div><button class="choose" data-id="nocturne">Select <span>↗</span></button></div>
+      </article>
+      <article class="card" data-design="heritage">
+        <div class="card-top"><span class="number">04</span><span class="tag">CLUB</span><span class="chosen">SELECTED</span></div>
+        <div class="stage" role="img" aria-label="Heritage — striped cream club kit and red frame"></div>
+        <div class="card-bottom"><div><h2>Heritage<span class="swatches"><i style="--swatch:#e9e4d8"></i><i style="--swatch:#25394c"></i><i style="--swatch:#b84b40"></i></span></h2><p>Cream club kit, stripes, and a slim red frame.</p></div><button class="choose" data-id="heritage">Select <span>↗</span></button></div>
+      </article>
+    </section>
+    <footer><p><span class="drag-icon">↔</span> Drag to rotate all four riders. Scroll to zoom.</p><div><a href="kolarz.blend" download>Blender source ↓</a><a id="download" href="kolarz-01-velocity.glb" download>Selected GLB model ↓</a></div></footer>
+  </main>
+  <script type="module" src="studio.js?v=20261030-sprint"></script>
+</body>
+</html>
