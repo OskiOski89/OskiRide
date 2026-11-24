@@ -15,7 +15,7 @@ Revisit the same course to practice a climb or compare your efforts over time. Y
 On Alpe d’Huez, a keyboard-powered rider starts at **0 W**, moves when power is added with the slider, shifts up one gear, and switches from the chase view to the overhead camera.
 
 <details>
-<summary>Play the 12-second ride demo</summary>
+<summary>Play the ride demo</summary>
 
 ![OskiRide starts at zero watts, adds simulated power, shifts up, and switches to the overhead camera](docs/media/ride-demo.gif)
 
