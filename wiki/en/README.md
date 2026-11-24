@@ -12,4 +12,4 @@ OskiRide 1.0.1 is a 3D indoor cycling simulator for Windows x64. Use keyboard-co
 | [Troubleshooting](Troubleshooting.md) | Connection problems, diagnostics, recovery, architecture, and tests |
 | [Privacy and ride data](Privacy.md) | Local profiles, GPX files, stored rides, and exports |
 | [Screenshots](Screenshots.md) | Routes, Bluetooth setup, an active interval, ride analysis, and Rider Studio |
-| [Ride demo](../../README.md#ride-demo) | Starting from 0 W, virtual shifting, and switching cameras |
+| [Ride demo](../../README.md#ride-demo) | A continuous chase-camera view of the Alpe d’Huez climb |

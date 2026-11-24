@@ -47,7 +47,7 @@ Compare the first result with the hash before the installer filename. Letter cas
 
 The gallery includes Bluetooth pairing, riding in the rain, the workout library, an active interval, the ride summary, and Rider Studio. [Explore all nine screenshots](https://github.com/OskiOski89/OskiRide/blob/main/wiki/en/Screenshots.md) · [Workout in progress](https://github.com/OskiOski89/OskiRide/blob/main/wiki/en/Screenshots.md#workout-in-progress)
 
-Watch OskiRide start from **0 W**, shift up a virtual gear, and switch to the overhead camera on Alpe d’Huez. [Watch the ride demo in the README](https://github.com/OskiOski89/OskiRide#ride-demo) · [Download the MP4](https://github.com/OskiOski89/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4)
+Follow the rider up Alpe d’Huez in a continuous chase-camera shot with live ride data and the elevation profile in view. [Watch the ride demo in the README](https://github.com/OskiOski89/OskiRide#ride-demo) · [Download the MP4](https://github.com/OskiOski89/OskiRide/releases/download/v1.0.1/OskiRide-Ride-Demo.mp4)
 
 ## What you can do in OskiRide
 

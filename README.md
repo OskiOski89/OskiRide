@@ -12,12 +12,12 @@ Revisit the same course to practice a climb or compare your efforts over time. Y
 
 ## Ride demo
 
-On Alpe d’Huez, a keyboard-powered rider starts at **0 W**, moves when power is added with the slider, shifts up one gear, and switches from the chase view to the overhead camera.
+Follow the rider up Alpe d’Huez in one continuous chase-camera shot. The display shows power, speed, the route map, and the gradient ahead.
 
 <details>
 <summary>Play the ride demo</summary>
 
-![OskiRide starts at zero watts, adds simulated power, shifts up, and switches to the overhead camera](docs/media/ride-demo.gif)
+![Chase-camera view of a cyclist climbing Alpe d’Huez, with live ride data, a route map, and an elevation profile](docs/media/ride-demo.gif)
 
 </details>
 

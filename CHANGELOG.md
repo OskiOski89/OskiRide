@@ -23,6 +23,7 @@ Format oparty jest na zasadach [Keep a Changelog](https://keepachangelog.com/).
 - Added a trainer-test form for Windows pairing, SIM, and ERG results, plus a short [roadmap](ROADMAP.md).
 - Prioritized physical hardware coverage and more faithful GPX route reconstruction in the roadmap.
 - Shortened the ride demo ending and removed a brief camera flash from the GitHub video and README preview.
+- Replaced the ride demo and README preview with a continuous chase-camera recording of the Alpe d’Huez climb that opens mid-ride.
 
 ## [1.0.0] — 2026-11-23
 
